@@ -45,7 +45,7 @@ title_separator = "|"  # Separator between title and title_addition, set as |, -
 title_addition = "A Personal Blog" # a default value for title addition
 recent = true # TOC / index
 recent_items = 9
-author = "Mark F" # Put Your Name here
+author = "Mark" # Put Your Name here
 
 title_size_index = "s85" # size: s95, s90, s85, s80, s75, s70, false(full size)
 meta_index = { position="bottom", size="s90", author=false, readtime=false, readstring="min", date=true, categories_tags=true, divider=" " }
@@ -54,7 +54,7 @@ meta_post = { position="top", size="s95", author=true, readtime=false, readstrin
 ## divider:    "&middot;"    "&bull;"    " "
 
 footer_size = "s90" # size: s95, s90, s85, s80, s75, s70, false(full size)
-footer_credit = true
+footer_credit = false
 #footer_credit_override = '<p class="s90">Powered by <a href="https://www.getzola.org/" target="_blank">Zola</a> &#38; <a href="https://github.com/Jieiku/abridge/" target="_blank">Abridge</a></p>'
 
 #uncomment one of the two lines, or neither, depending on which type of logo you want to use:
