@@ -220,9 +220,10 @@ In an even more extreme case, check out TypeScript's none-goals ([link](https://
 
 It seems to me that this is the state of affairs regardless of type system soundness. Short of full state space exploration or formal verification, even sound type systems may still have developers reasoning about their programs in a way that a more expressive type system could encode. You can think of an assembly languages' type system as being sound (*Everything is a series of bits! It can't be fooled!*), but of course before doing anything a developer will immediately layer their own more expressive types on top of those (They simply lose any ability to check them in an automated way).
 
-**A question:**
-1. The false sense of safety of an expressive, but ultimately flawed type system.
-2. The lack of safety of an impoverished type system.
+**Another question:** Which is preferable?  
+
+  1. The false sense of safety of an expressive, but ultimately flawed type system.
+  2. The lack of safety of an impoverished type system.
 
 Considering that a type system takes time both to learn and to use, it's unlikely massive software systems will get written in languages like Agda. The burden to hire developers and the extra effort required to use the type system may create an insurmountable problem for now. However, there's some hope, languages (like Haskell, Rust, etc) are experiments in what can be done to keep the type system expressive, sound, as well as productive.
 
@@ -232,7 +233,7 @@ There's a very compelling case to be made that type systems are given a differen
 
 There's a lens through which this is a healthy way to look at things. When you learn a new language, the types are some part of the syntax and semantics. We don't typically look at common elements of syntax between languages and see any deeper meaning. Certainly the fact that so many languages use `{` and `}` is an artifact of history and doesn't offer some fundamental insight into the nature of programming languages.
 
-Perhaps it **should** be surprising that a language’s ad-hoc system for labelling values with types is best described/expressed with mathematics’ foundational building blocks. After all, the Types as seen in dependent type theory feel far removed from the `int`, `long`, `float`, `double`, `Object`, or `SimpleBeanFactoryAwareAspectInstanceFactory` as seen in Java. Perhaps it should also be surprising that all these seemingly different systems (so often developed entirely independently of one another) should end up being related in curious and interesting ways.
+Perhaps it **should** be surprising that a language’s ad-hoc system for labelling values with types is best described/expressed with mathematics’ foundational building blocks. After all, the Types as seen in dependent type theory feel far removed from the <mark>int</mark>, <mark>long</mark>, <mark>float</mark>, <mark>double</mark>, <mark>Object</mark>, or <mark>SimpleBeanFactoryAwareAspectInstanceFactory</mark> as seen in Java. Perhaps it should also be surprising that all these seemingly different systems (so often developed entirely independently of one another) should end up being related in curious and interesting ways.
 
 **Here is my contention:** Insofar as they help developers, less expressive type systems can be seen as carving out little chunks of a grander underlying theory while leaving developers to reason the rest out on their own. More expressive type systems can capture or encode more abstract reasoning. Regardless of how directly usefull such lines of thinking are, it's enriching to think along these lines. 
 
