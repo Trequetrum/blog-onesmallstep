@@ -1,5 +1,5 @@
 # do NOT include a trailing slash on the base URL for web urls
-base_url = "https://abridge.netlify.app"
+base_url = "https://trequetrum.github.io/blog-onesmallstep"
 #base_url = "/home/jieiku/.dev/abridge/public/" # for locally usable build directly from disk, also set in [extra] section uglyurls = true
 title = "One Small Step"
 description = "Now let it work. Mischief, thou art afoot, Take thou what course thou wilt!"
