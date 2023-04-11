@@ -5,7 +5,8 @@ template = "pages.html"
 draft = false
 +++
 
-# One Small Step
+<h1 style="text-align: center;"> About One Small Step </h1>
+<h3 style="text-align: center;"> Blogging About Life & Computers </h3>
 
 <br><br>
 

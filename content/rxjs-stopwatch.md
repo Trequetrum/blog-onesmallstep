@@ -1,6 +1,6 @@
 +++
 title = "An RxJS Stopwatch Implementation"
-date = 2021-01-29
+date = 2023-04-06
 draft = false
 
 [taxonomies]
@@ -16,196 +16,69 @@ keywords = "TypeScript, RxJS, Programming"
 
 ### Preamble:
 
-I figured it would be interesting to create a custom stopWatch observable. The RxJS **way** would be to implement this by switching into and out of timers/intervals.
+Back in the spring of 2020, I ran face first into the the Baader-Meinhof Phenomenon wherein I answered a stack overflow question about creating a stopwatch using RxJS and found myself refering back to variations on that exact question every few weeks throughout the summer. At the time, I created a quick non-public github gist that I could reference whenever such a question appeared. 
 
-Another interesting way to implement this is by using `setTimeout` instead. `setTimeout` should actually require a bit less memory as we're not leaning on the observable apparatus to accomplish our timing goals
+I'm putting it here now because it seems intuitively like a task that a streaming library should be able to handle easily but I never found an answer that clicked for me. Perhaps somebody else will discover or point me at a clever solution that I hadn't considered.
 
-How will this work? Our custom observable creates a stream that outputs the number on the stopwatch and is controlled by a separate stream (Here called `control$`). So when `control$` emits "START", the stopWatch starts, when it emits "STOP", the stopwatch stops, and when it emits "RESET" the stopwatch sets the counter back to zero. When `control$` errors or completes, the stopwatch errors or completes.
+I'm assuming some passing familiarity with RxJS, or really any similar streaming library.
+
+### Some Background
+
+The crux of the problem is this: 
+
+- Our input is a stream that emits a series of "RUN/PAUSE" or "RESET" actions over an arbirary span of time.
+- If the input steams errors or completes, then so should the output. Once the output is done, there should be no ongoing timers (or other memory leaks).
+- The watch has two states: <mark>Running</mark> or <mark>Paused</mark>
+- - While <mark>Running</mark>: The output should emit a number every `interval` milliseconds.
+- - While <mark>Paused</mark>: There should be no output
+- The watch starts in the Paused state and and only switches state when the source emits "RUN/PAUSE"
+- The first number to be emitted is a zero
+- - If the source emits "RESET", the next number emitted is a zero
+- - Otherwise, the emitted number is always the previous emitted number + 1.
 
 ### Implemented with switchMap and Timer
 
+Here is a solution which leans on RxJS' switchMap operator to manage an internal stopwatch timer. We also use scan to track the watches current state for us. In general, the solution is short enough that it's pretty straight forward.
+
+What I don't like is how `count` is managed. It's a fairly contained little piece of state and it seems like the natural way to manage this. On the other hand, `defer` adds a bunch of clutter and exists only to add in a little bit of state. AIt simply feels like there should be a clean solution that doesn't mutate anything. 
+
+The solutions I've thought up that don't mutate state end up being messier to an extent which I don't think makes it worth it. For example, I don't think it's worth doing something like using a long running interval/timer/system-time and remembering pauses via an offset.
+
 ```TypeScript
-type StopwatchAction = "START" | "STOP" | "RESET" | "END";
+type StopwatchAction = 'RUN/PAUSE' | 'RESET';
 
 function createStopwatch(
-  control$: Observable<StopwatchAction>, 
+  control$: Observable<StopwatchAction>,
   interval = 1000
-): Observable<number>{
-
+): Observable<number> {
   return defer(() => {
-    let toggle: boolean = false;
-    let count: number = 0;
+    let count = 0;
 
-    const ticker = timer(0, interval).pipe(
-      map(x => count++)
-    );
-    const end$ = of("END");
-
-    return concat(
-      control$,
-      end$
-    ).pipe(
-      catchError(_ => end$),
-      switchMap(control => {
-        if(control === "START" && !toggle){
-          toggle = true;
-          return ticker;
-        }else if(control === "STOP" && toggle){
-          toggle = false;
-          return EMPTY;
-        }else if(control === "RESET"){
-          count = 0;
-          if(toggle){
-            return ticker;
-          }
-        }
-        return EMPTY;
-      })
+    return control$.pipe(
+      scan(
+        ({ running }, action) =>
+          action == 'RUN/PAUSE'
+            ? { running: !running, reset: false }
+            : { running, reset: true },
+        { running: false, reset: false }
+      ),
+      concatWith(of({ running: false, reset: false })),
+      tap(({ reset }) => { if (reset) count = 0; }),
+      switchMap(({ running }) =>
+        running ? timer(0, interval).pipe(map((_) => count++)) : EMPTY
+      )
     );
   });
 }
-```
-
-### Implemented with setTimeout
-
-```TypeScript
-function createStopwatch(control: Observable<string>, interval = 1000): Observable<number> {
-  return new Observable(observer => {
-    let count: number = 0;
-    let tickerId: number = null;
-
-    const clearTicker = () => {
-      if(tickerId != null){
-          clearTimeout(tickerId);
-          tickerId = null;
-        }
-    }
-    const setTicker = () => {
-      const recursiveTicker = () => {
-        tickerId = setTimeout(() => {
-          observer.next(count++);
-          recursiveTicker();
-        }, interval);
-      }
-      clearTicker();
-      observer.next(count++);
-      recursiveTicker();
-    }
-
-    control.subscribe({
-      next: input => {
-        if(input === "START" && tickerId == null){
-          setTicker();
-        }else if(input === "STOP"){
-          clearTicker();
-        }else if(input === "RESET"){
-          count = 0;
-          if(tickerId != null){
-            setTicker();
-          }
-        }
-      },
-      complete: () => {
-        clearTicker();
-        observer.complete();
-      },
-      error: err => {
-        clearTicker();
-        observer.error(err);
-      }
-    });
-
-    return {unsubscribe: () => clearTicker()};
-  });
-}
-```    
-
-### Create a stopwatch as an object
-
-If the control stream is going to be a subject, this is a good way to create the stopwatch.
-
-```TypeScript
-function getStopWatch(interval: number = 1000): {
-  control$: Subject<StopwatchAction>, 
-  display$: Observable<number>
-} {
-  const control$ = new Subject<StopwatchAction>();
-  return {
-    control$,
-    display$: createStopwatch(control$, interval)
-  }
-}
-```
-
-Stopwatch Object in Use:
-```TypeScript
-const watch = getStopWatch();
-watch.display$.subscribe(/*Numbers emitted here every interval once started by control$*/);
-watch.control$.next("START");
-watch.control$.next("STOP");
-watch.control$.next("RESET");
-// Completing the control cleans up everything
-watch.control$.complete();
 ```
 
 ### StopWatch in Use
-
-Here is an example of this observable being used. I manage the control stream via a subject, but it could just as easily be merged/mapped DOM events or somesuch. 
-
-```TypeScript
-const watch = getStopWatch(250);
-watch.display$.subscribe(console.log);
-
-// We send a new action to our control stream every 1 second
-const actions: StopwatchAction[] = ["START", "STOP", "START", "RESET", "START"]
-
-zip(from(actions), interval(1000)).pipe(
-  map(([x,_]) => x),
-  finalize(() => {
-    // After 5 seconds, unsubscribe via the control
-    // If our control finishes in any way (
-    // completes, errors, or is unsubscribed), our
-    // sopwatch reacts by doing the same.
-    watch.control$.complete();
-  })
-).subscribe(action => {
-  console.log(action);
-  watch.control$.next(action);
-});
-```
-
-### StopWatch in Use # 2
-
-This controls the stopwatch with `setTimeout` instead of `interval`.
-
-```TypeScript
-const watch = getStopWatch(250);
-watch.display$.subscribe(console.log);
-
-// We send a new action to our control stream every 1 second
-const actions: StopwatchAction[] = ["START", "STOP", "START", "RESET", "START"]
-
-actions.forEach((action, index) => {
-  setTimeout(() => {
-    console.log(action);
-    watch.control$.next(action);
-  },
-  index * 1000);
-})
-
-// Unsubscribe via the control
-setTimeout(() => {
-  watch.control$.complete();
-}, actions.length * 1000);
-```
-
-### StopWatch in Use # 3
 
 Control a stopwatch with DOM events to set fields on the DOM.
 
 ```TypeScript
 createStopwatch(merge(
-  fromEvent(startBtn, 'click').pipe(mapTo("START")),
+  fromEvent(startBtn, 'click').pipe(mapTo('RUN/PAUSE')),
   fromEvent(resetBtn, 'click').pipe(mapTo("RESET"))
 )).subscribe(seconds => {
   secondsField.innerHTML  = seconds % 60;
