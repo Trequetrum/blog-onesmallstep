@@ -16,11 +16,18 @@ keywords = "TypeScript, RxJS, Programming"
 
 ### Preamble:
 
-Back in the spring of 2020, I ran face first into the the Baader-Meinhof Phenomenon wherein I answered a stack overflow question about creating a stopwatch using RxJS and found myself referring back to variations on that exact question every few weeks throughout the summer. At the time, I created a quick non-public github gist that I could reference whenever such a question appeared. 
+Back in the spring of 2020, I ran face first into the stack overflow equivalent to the Baader-Meinhof Phenomenon. I answered a stack overflow question about creating a stopwatch using RxJS and found myself referring back to variations on that exact question every few weeks throughout the summer. I'm putting it here now because it seems intuitively like a task that a streaming library should be able to handle easily but I never found an answer that clicked for me. Perhaps somebody else will discover or point me at a clever solution that I hadn't considered.
 
-I'm putting it here now because it seems intuitively like a task that a streaming library should be able to handle easily but I never found an answer that clicked for me. Perhaps somebody else will discover or point me at a clever solution that I hadn't considered.
-
-I'm assuming some passing familiarity with RxJS, or really any similar streaming library.
+I'm also including it because I think it represents an beginner/intermediate understanding of Reactive Extensions. In a sense, I think it has some pedagogical merit for a beginner looking to sharpen their skills a bit.
+- It uses `defer` to capture state in a closure
+  - Each subscription create it's own local state
+  - Operators like `retry` behave as expected
+- It uses `scan` to incrementally build data
+  - `reduce`, `scan`, and `expand` are friendly operators that are often overlooked
+- It uses a higher order operator — `switchMap` — to manage observable lifetimes
+  - mastering `mergeMap`, `switchMap`, `concatMap`, and `ExhaustMap` is nessesary to be proficent with Reactive Extensions
+- It builds a custom RxJS Operator
+  - understanding how to create an `OperatorFunction` generally means heading toward an understanding a whole host of interesting concepts that RxJS uses liberally. These are currying, function composition, reducers (aka: fold, accumulate), and finally transducers (composable higher-order reducers).
 
 ### The Problem
 
@@ -49,9 +56,9 @@ The solutions I've thought up that don't mutate state end up being messier to an
 ```TypeScript
 type StopwatchAction = 'RUN/PAUSE' | 'RESET';
 
-function createStopwatch(
+function createStopwatch_static(
   control$: Observable<StopwatchAction>,
-  interval = 1000
+  interval: number
 ): Observable<number> {
   return defer(() => {
     let count = 0;
@@ -72,6 +79,13 @@ function createStopwatch(
     );
   });
 }
+
+// Create an OperatorFunction that can be used in an RxJS pipe
+function createStopwatch(
+  interval = 1000
+): OperatorFunction<StopwatchAction, number> {
+  return control$ => createStopwatch_static(control$, interval);
+}
 ```
 
 ### StopWatch in Use
@@ -79,12 +93,20 @@ function createStopwatch(
 Control a stopwatch with DOM events to set fields on the DOM.
 
 ```TypeScript
-createStopwatch(merge(
-  fromEvent(startBtn, 'click').pipe(mapTo('RUN/PAUSE')),
-  fromEvent(resetBtn, 'click').pipe(mapTo("RESET"))
-)).subscribe(seconds => {
-  secondsField.innerHTML  = seconds % 60;
+// The user clicking buttons in the UI creates the input stream
+merge(
+  fromEvent(startBtn, 'click').pipe(map((_) => 'RUN/PAUSE' as const)),
+  fromEvent(resetBtn, 'click').pipe(map((_) => 'RESET' as const))
+).pipe(
+  // Operator function turns StopwatchActions into numbers
+  // The default interval is a second, so we don't set it
+  createStopwatch()
+  // If the stopwatch emits an error, re-create the stopwatch
+  retry()
+).subscribe(seconds => {
+  // Edit the DOM to display the current seconds
+  secondsField.innerHTML = seconds % 60;
   minuitesField.innerHTML = Math.floor(seconds / 60) % 60;
-  hoursField.innerHTML    = Math.floor(seconds / 3600);
+  hoursField.innerHTML = Math.floor(seconds / 3600);
 });
 ```
