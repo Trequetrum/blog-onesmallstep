@@ -12,7 +12,7 @@ toc = true
 keywords = "Types, Syntax, Semantics, Logic, Math, Foundation, Type Theory, Programming, Language"
 +++
 
-## Preface
+# Preface
 
 This is some of my meandering thoughts about **types**, which I'll argue represent the formal ways in which we can reason about text<sup>[1]</sup> as a program. It's a semi-philosophical look at some of the fundamental sorts of reasoning that computer scientists do. I don’t expect reading this will make you a better programmer, but it may give you a fresh perspective when approaching types and I hope it's a fun read regardless.
 
@@ -24,7 +24,7 @@ The plan is to update this as my understanding evolves.
 
 <sup>[1]</sup> Any data ~~structure~~ capable of encoding the structure of a program
 
-## What is a Type?
+# What is a Type?
 
 When you open a Java Class file and see:
 
@@ -42,13 +42,150 @@ let a: i32 = 5;
 
 At their core, types seem like a very simple, but frustratingly abstract thing. They have a somewhat liminal nature, existing in many forms directly in syntax — where rules inductively define well typed syntax — and also in the meta-language — where we leave it as an exercise to the reader to understand why some expressible syntax is not necessarily meaningful. 
 
-That's a rather vague; in programming languages types seem to be restrictions<sup>[1]</sup> on the symbolic construction of a program. For example, this can be seen as restrictions on which values can be assigned to a variable, passed to a function, appended to a list, and so on. In the broader context of math, they're used to restrict which statements a mathematician spends time pondering. In set theory, for instance `π ∈ cos` is a well-formed mathematical statement whose truth value is hopefully false but doesn't materially matter (In the abstract, it's not a well typed statement).
+That's rather vague; in programming languages types seem to be restrictions<sup>[1]</sup> on the symbolic construction of a program. For example, this can be seen as restrictions on which values can be assigned to a variable, passed to a function, appended to a list, and so on.
 
-A less intuitive but more direct example comes from contrasting Von Neuman's and Zermello's constructions for the Natural Numbers (ℕ — Numbers from 0 onward, you can call them the whole numbers if you prefer). In set theory, `0 ∈ 1` is a well formed mathematical statement which happens to be true under Von Neuman's ℕ and false under Zermello's ℕ. As I understand it, Set Theorists don't consider this a problem because they stick to the properties of a construction of ℕ only insofar as they're equal (up to isomorphism) with any other possible construction of ℕ. It turns out that propositions like `0 ∈ 1` are not. 
+----
 
-A type theorist doesn't need to abstract such statements away, the equivalent statement in Type Theory can't be meaningfully constructed. There's a sense in which Type Theory for math and Type Systems for computer science are ways to reify notions like this from the meta-theory into the theory itself. It restricts one from constructing statements like `0 ∈ 1`, or `5 + Cat()` because if expressed correctly, such statements will not be well typed. 
+<sup>[1]</sup> Talking about types as *restrictions* on a language is perhaps an aesthetically poor choice.
 
-In languages without type *systems*, types appear in the margins. Programmers writing assembly still work with basic types like:
+- **First:** Dynamically typed languages have a few tricks that make it appear at first glance like they don't do this. They tend to use hidden control flow to look a bit like a language without a type system (We'll discuss dynamic typing further when it's relevant).
+  
+- **Second:** A related topic that we're not going to cover at length here is that the types in a language's type system can double as a *domain specific language*. This means that defining types not only encodes machine verifiable invariants, it may also specify computation.<br><br>
+  Languages with rich type systems tend to come equipped with tools by which the compiler can generate incredible amounts of boilerplate code on behalf of the programmer. This means they tend to feel much more expressive in many cases. Serialization, deserialization, methods, algorithms, integration, testing, code reuse, and more can sometimes be automated based on types.<br><br>
+  Some styles of design/API, like function overloading (letting the compiler select an implementation based on types), or dynamic dispatch (say: letting the compiler thread a virtual function table through part of a program) is only possible with an appropriate type system.
+
+## Motivating the use of types
+
+Lets jump into a simple (although contrived) example of how this might be helpful. Here's a simple function you often find in the opening chapters of a introduction to python book:
+
+```Python
+def factorial(n):
+  if n == 0:
+    return 1
+  else:
+    return n * factorial(n-1)
+```
+
+If you pass this function a negative number, it will never hit the base-case of `n == 0` and will instead recurses endlessly, hanging the program and burning CPU cycles until something kills the process. In truth, Python has a recursion limit which it will eventually reach in this case, though if you re-write this function using a while loop instead of recursion you lose even that extra bit of safety.
+
+Consider a relatively large, long-lived program. Say a web-server responding to queries. It's responding to millions or requests per day, but unfortunately, roughly once per month the server crashes when `factorial` is called. There is some relatively rare sequence of events that results in factorial being called with some value for which it isn't well behaved. You're on a time crunch and you know your server is robust against throwing errors so you write a bit of code to solve the problem:
+
+```Python
+def factorial(n):
+  if n < 0:
+      raise "factorial only accepts numbers greater than zero :)"
+  else:
+      return __factorial(n)
+      
+def __factorial(n):
+  if n == 0:
+    return 1
+  else:
+    return n * factorial(n-1)
+```
+
+Now you've partially solved the issue. Once a month or so, the server surprises a client by returning some error code, but at least the server doesn't crash. Only the issue regresses when a new feature requires the following class. Almost immediately, a junior dev copies and pastes some code and accidentally passes an instance of `Color` to `factorial`.
+
+```Python
+class Color:
+    def __init__(self, r,g,b):
+        self.r = r
+        self.g = g
+        self.b = b
+        
+    def __add__(self, v):
+        if isinstance(v, int):
+            return Color(
+                self.r + v,
+                self.g + v,
+                self.b + v
+            )
+        elif isinstance(v, Color):
+            return Color(
+                (self.r + v.r) % 250,
+                (self.g + v.g) % 250,
+                (self.b + v.b) % 250,
+            )
+        else:
+            return self
+            
+    def __sub__(self, v):
+        if isinstance(v, int):
+            return self.__add__(-v)
+        elif isinstance(v, Color):
+            return self.__add__(Color(-v.r,-v.g,-v.b))
+        else:
+            return self
+        
+    def __mul__(self, v):
+        if isinstance(v, int):
+            return Color(
+                self.r * v,
+                self.g * v,
+                self.b * v
+            )
+        elif isinstance(v, Color):
+            return Color(
+                (self.r * v.r) % 250,
+                (self.g * v.g) % 250,
+                (self.b * v.b) % 250,
+            )
+        else:
+            return self
+        
+    def __eq__(self, v):
+        try:
+            return (self.r == v.r 
+                and self.g == v.g
+                and self.b == v.b)
+        except:
+            return False
+    
+    def __lt__(self, v):
+        try:
+            return (self.r < v.r 
+                and self.g < v.g
+                and self.b < v.b)
+        except:
+            return False
+```
+
+Because `Color` is defined "just so", passing it to factorial will crash the server again. **Bummer**. You could solve this with some more code, though because factorial is used on the hot-path, your server's performance is suffering. Instead, you take the time to hunt down the known bugs and revert back to the more performant version of factorial. Then you write a comment explaining the function's per-condition.
+
+```Python
+# !!!IMPORTANT!!! If you're reviewing code that calls this function, double and 
+# triple check that it is being called with a positive integer. 
+def factorial(n):
+  if n == 0:
+    return 1
+  else:
+    return n * factorial(n-1)
+```
+
+With a hundred developers working on the code base, the best you can do is cross your fingers and hope everybody understands how to call this function? Well, not really. It turns out that a type system can solve this problem statically without any performance penalty for the response time of your server. Here's how you might port this function to rust:
+
+```Rust
+fn factorial(n: u32) -> u32 {
+    if n == 0 {
+        1
+    } else {
+        n * factorial(n - 1)
+    }
+}
+```
+
+This signature (`fn:(u32) -> u32`) effectively says "calling factorial with a positive integer will return a positive integer, calling it with any other value is undefined behaviour and should be avoided." Alone, this isn't any better than a comment, fortunately Rust comes paired with a type checker that is able to check every invocation of `factorial` in the code for your server and confidently assure you that none of the hundred developers working on the code base has accidentally invoked `factorial` with any other value. This incurs a penalty during compilation, but it doesn't affect the run-time of your program and it ensures that certain bugs never appear in the compiled artifact.
+
+For `factorial`, this is only a small win. After all the name seems descriptive enough that it feels quite unlikely a developer would misuse it. It takes relatively few building blocks to form the foundation for surprisingly robust type-level systems. By which I mean design patterns and software architectures that can be encoded (and enforced) at least in part in the language itself using its type system. For instance, Rust's type system is expressive enough to encode an SQL schema and ensure that any statically written query does not compile if it doesn't meet the schema, it can also automaticaly generate code that checks dynamic queries at runtime. You can generate these types automatically at compile time by querying your SQL server for the most up to date schema. Those types can be available across the entire program meaning that information about whether some value has been checked against the schema for correctness can be encoded in it's type and passed across isolated subsystems without the fear that it hasn't been sanitised and without performing the sort of "shot-gun validation" in which values are checked everywhere in the hopes that every error is caught somewhere.
+
+Writing code knowing that future developers (including yourself) will be forced to meet its pre-conditions is generally liberating. You can push the responsibility for type safety backwards onto callers. Conversly, you can perform some computation to parse a less percise representation into a more percise one knowing that developers writting downstream code will never need to audit the program to be sure a value meets certain criteria.
+
+> In other words, write functions on the data representation you wish you had, not the data representation you are given. The design process then becomes an exercise in bridging the gap, often by working from both ends until they meet somewhere in the middle.
+> - Alexis King — [Parse, don’t validate (link)](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/)
+
+This style of software design is certainly possible in an assembly language, but as the size of the codebase and the number of developers increases, such designs are hard to maintain. While jumping into a Haskell codebase and implementing some new feature is often daunting and difficult, it is also generally more difficult to do wrong since the compiler can perform exhaustiveness checks to ensure that your functions are total, that errors are handled, and that any new code type checks against everything else in the codebase.
+
+In languages without type *systems*, types still appear in the margins. Programmers writing assembly still work with basic types like:
 - <mark>boolean</mark>, 
 - <mark>string</mark>, 
 - <mark>integer</mark>, 
@@ -66,17 +203,7 @@ These types appear directly and/or obliquely in comments, notes, and design docu
 
 Tracking types throughout your program is tedious and error-prone, but can fortunately be automated. Having a type system (static, dynamic, or both) is standard in programming languages because of how pervasive and foundational types are when wanting to correctly instruct a computer.
 
-----
-
-<sup>[1]</sup> Talking about types as *restrictions* on a language is perhaps an aesthetically poor choice.
-
-- **First:** Dynamically typed languages have a few tricks that make it appear at first glance like they don't do this. They tend to use hidden control flow to look a bit like a language without a type system (We'll discuss dynamic typing further when it's relevant).
-  
-- **Second:** A related topic that we're not going to cover at length here is that the types in a language's type system can double as a *domain specific language*. This means that defining types not only encodes machine verifiable invariants, it may also specify computation.<br><br>
-  Languages with rich type systems tend to come equipped with tools by which the compiler can generate incredible amounts of boilerplate code on behalf of the programmer. This means they tend to feel much more expressive in many cases. Serialization, deserialization, methods, algorithms, integration, testing, code reuse, and more can sometimes be automated based on types.<br><br>
-  Some styles of design/API, like function overloading (letting the compiler select an implementation based on types), or dynamic dispatch (say: letting the compiler thread a virtual function table through part of a program) is only possible with an appropriate type system.
-
-## The Naive View of Types in Computer Science
+# The Naive View of Types in Computer Science
 
 > [A] computer is unable to discriminate between for example a memory address and an instruction code, or between a character, an integer, or a floating-point number, because it makes no intrinsic distinction between any of the possible values that a sequence of bits might *mean*
 >
@@ -111,7 +238,7 @@ You can see the problem. You cannot tell the type of this value by inspecting it
 
 Programmers need to reason about the types of the data they are working with in order to ensure that their programs are correct. Note that programs are themselves data whose 0s and 1s are imbued with meaning and which developers must be able to reason about.
 
-## Typing Judgments are an Exercise in Abstraction
+# Typing Judgments are an Exercise in Abstraction
 
 So far I've quoted and discussed the view that:
 
@@ -123,7 +250,7 @@ The type system forms an abstraction boundary so that so long as the API of an `
 
 There is a connection to reasoning about the properties of a program separately from the program’s implementation that translates into reasoning about the properties of a type separate from their representation (In formal verification circles, they're the same style of reasoning. Full stop).
 
-What sorts of meaning a type system can express varies wildly from language to language. For example, in C just about everything is a number and you can accidentally multiply `North` by `Blue` since the type system can only understand their integer encoding. In Haskell, `North` may have the same run-time representation as an integer, but it has a different type. Once again, this just reinforces that a complete lack of a type system or an impoverished type system simply means that any work done by one developer to reason about types is either lost of must be passed on through some other means.
+What sorts of meaning a type system can express varies wildly from language to language. For example, in C just about everything is a number and you can accidentally multiply `North` by `Blue` since the type system can only understand their integer encoding. In Haskell, `North` may have the same run-time representation as an integer, but it has a different type. Once again, this just reinforces that a complete lack of a type system or an impoverished type system simply means that any work done by one developer to reason about types is either lost or must be passed on through some other means.
 
 > The fundamental problem addressed by a type system is to ensure that programs have meaning. The fundamental problem caused by a type system is that meaningful programs may not have meanings ascribed to them. The quest for richer type systems results from this tension.
 
@@ -135,7 +262,7 @@ You can put type information into the run-time of a program.
 
 The best known (and universally applauded) type that does this is the signed integer. Statically, a signed integer is a sum type. One bit is reserved to tell the system how to interpret the other bits. For example: if the tag bit is a `1`, the other bits represent the absolute 'value plus `1`' of a negative number (The 'plus `1`' means there's no way to represent `-0` as distinct from `+0`). If the tag bit is a zero, the other bits represent a positive number. Like any type, how this is done is down to convention. As long as disparate parts of the system/program agree on which bit is the front-matter for a signed integer, there is no further intrinsic meaning to the choice.
 
-This is a type that requires an invariant not explicit to the construction of the type being upheld. That is, that the front-matter bit faithfully describes what follows. If your system ever mis-manages the front-matter, then `7 - 10` becomes `3` instead of `-3` (or `2147483645` instead of `-3` given 2s compliment). There are strict rules for how the system is allowed to interact with such a type in order to maintain this invariant.
+This is a type that requires an invariant not explicit to the construction of the type being upheld. That is, that the front-matter bit faithfully describes what follows. If your system ever mismanages the front-matter, then `7 - 10` becomes `3` instead of `-3` (or `2147483645` instead of `-3` given 2s compliment). There are strict rules for how the system is allowed to interact with such a type in order to maintain this invariant.
 
 Being the tail part of a sum type changes the way you reason about a type, but it still meets everything else we discussed about types; both in giving values meaning and in abstracting representation.
 
@@ -149,11 +276,24 @@ It's an important point to reiterate, however, that types can be seen as a conce
 
 That's a bold claim and while I can't fully substantiate it, I hope to describe why the notion isn't too wild. 
 
-## Foundational Mathematics
+# Foundational Mathematics
 
-Types as they're understood in type theories are well documented, talked, and blogged about.
+Types aren't **just** a computer science concept. In the broader context of math, they can be used to restrict which statements a mathematician spends time pondering. In set theory, for instance `π ∈ cos` is a well-formed mathematical statement whose truth value is hopefully false but doesn't materially matter (It's a silly proposition, or in other words it's not a well typed statement).
 
-I'll give it a very superficial treatment here because I think it frames the discourse about types I aim to have below. I don't intend to talk about foundational mathematics, but I do intend to develop the intuition that the sort of thinking that a developer does while they program is generally structured well enough that it can be described/annotated/formalized/etc.
+Propositions like `3 ∈ π` make structuralists uncomfortable. If you ask a structuralist whether this proposition is true, they’ll immediately say "that makes no sense. The answer to such a question has nothing to do with 3 or π as things in themselves, or even as things in ℝ — it’s a question about a particular encoding in a particular universe."
+
+A less intuitive but more direct example comes from contrasting Von Neuman's and Zermello's constructions for the Natural Numbers (ℕ — Numbers from 0 onward, you can call them the whole numbers if you prefer). In set theory, `0 ∈ 1` is a well formed mathematical statement which happens to be true under Von Neuman's ℕ and false under Zermello's ℕ. As I understand it, Set Theorists don't consider this a problem because they stick to the properties of a construction of ℕ only insofar as they're equal (up to isomorphism) with any other possible construction of ℕ. It turns out that propositions like `0 ∈ 1` are not.
+
+The same issue resurfaces over and over again. For example:
+
+> there are two obvious constructions of ℝ, as a set of equivalence classes of Cauchy Sequences of rationals, or as the set of Dedekind cuts of rational numbers. Both give definite truth values to “silly” questions, but these answers are not properties of 3, π or ℝ, they’re properties of the encoding, and passing to a different encoding changes these properties, even though the essential properties of ℝ are preserved.
+>
+> The structuralists’ argument is that we shouldn’t be able to ask questions which aren’t structurally invariant.
+> - Professor Michael Shulman ([link](https://golem.ph.utexas.edu/category/2013/01/from_set_theory_to_type_theory.html))
+
+Just like a structuralist, a type theorist doesn't need to abstract such statements away, the equivalent statement in Type Theory can't be meaningfully constructed. There's a sense in which Type Theory for math and Type Systems for computer science are ways to reify notions like this from the meta-theory into the theory itself. It restricts one from constructing statements like `3 ∈ π`, or `5 + Cat()` because if expressed correctly, such statements will not be well typed. 
+
+Types as they're understood in type theories are well documented, talked, and blogged about. I don't understand them well enough to do them justice, nor are they really what this article wants to talk about. I'll attempt to give it a very superficial treatment here because I think it frames the discourse about types I aim to have below. I don't intend to talk about foundational mathematics, but I do intend to develop the intuition that the sort of thinking that a developer does while they program is generally structured well enough that it can be described/annotated/formalized/etc.
 
 More specifically, I want to discuss why I think programmers/developers use type-theoretic reasoning even if their language doesn't provide the means to annotate or check such reasoning for correctness. The idea that underpins much of this thinking is the Curry–Howard correspondence which shows a deep, reoccurring, and outwardly mysterious correspondence between logic and computing. 
 
@@ -199,7 +339,23 @@ Afterwards, I’m asked to formalize my reasoning using first-order predicate lo
 This interplay is at work with Types, Developers, and Type Systems. Typically, it doesn't matter whether logic **describes** a style of thinking or a style of thinking **is** logical. If some part of what is said brushes your intuition incorrectly, see if re-framing it this way re-aligns this discussion for you.
 {% end %}
 
-## About Unsound Type Systems
+# The Pervasiveness of Type Systems
+
+There's a very compelling case to be made that type systems are given a different treatment depending on where they're used. C++'s Templating and TypeScript both use duck typing while Haskell has a nominal type system heavily based on Hindley–Milner type inference. Java and C hardly use inference at all and ask the developer to label their types in even the most obvious cases. Python shoves most of it's types into the run-time. These all seem like very different things and it may well be that any insight gained by understanding what unifies these type systems has a fleeting impact on the development of any given software system.
+
+There's a lens through which this is a healthy way to look at things. When you learn a new language, the types are some part of the syntax and semantics. We don't typically look at common elements of syntax between languages and see any deeper meaning. Certainly the fact that so many languages use `{` and `}` is an artifact of history and doesn't offer some fundamental insight into the nature of programming languages.
+
+Perhaps it **should** be surprising that a language’s ad-hoc system for labelling values with types is best described/expressed with mathematics’ foundational building blocks. After all, the Types as seen in dependent type theory feel far removed from the <mark>int</mark>, <mark>long</mark>, <mark>float</mark>, <mark>double</mark>, <mark>Object</mark>, or <mark>SimpleBeanFactoryAwareAspectInstanceFactory</mark> as seen in Java. Perhaps it should also be surprising that all these seemingly different systems (so often developed entirely independently of one another) should end up being related in curious and interesting ways.
+
+**Here is my contention:** Insofar as they help developers, less expressive type systems can be seen as carving out little chunks of a grander underlying theory while leaving developers to reason the rest out on their own. More expressive type systems can capture or encode more abstract reasoning. Regardless of how directly useful such lines of thinking are, it's enriching to think along these lines. 
+
+I’m reminded of how often I’ve seen and heard developers express that programming isn’t mathematics so much as it’s "*just logic*". The idea is that the exercise you’re engaged in while writing a program is much easier than, for example grade 11 Calculus. Instead, I suspect that — especially for shorter or simpler programs — the sorts of reasoning you invoke are much more foundational and much less abstract than some of the Math you’ve already learned. As different as it looks, a simple Agda program (for example, one that sorts a list) often just makes explicit the sort of reasoning a Python developer may implicitly perform while writing code.
+
+Across all the various general purpose languages, the logical building blocks by which you program don’t really change too much. Pretty much every language with a type system is using types to solve the same problem. Whether they realize it or not, they're attempting to embed some form of type-like abstract reasoning in their language (so that it can be automatically checked). They do this (to varying degrees of success) to catch errors or improve productivity by localizing reasoning.
+
+Languages with dynamic type systems do this with with a run-time cost and try to ensure type errors appear as errors rather than just strange behaviour. It's often possible to subvert the type system, allowing a program to elicit some undesired behaviour. 
+
+# About Unsound Type Systems
 
 Some languages have issues with their type system’s soundness. Java’s arrays are famous for the ease with which you can fool the type system. The following compiles just fine even though the type for `first` is wrong. 
 
@@ -226,19 +382,3 @@ It seems to me that this is the state of affairs regardless of type system sound
   2. The lack of safety of an impoverished type system.
 
 Considering that a type system takes time both to learn and to use, it's unlikely massive software systems will get written in languages like Agda. The burden to hire developers and the extra effort required to use the type system may create an insurmountable problem for now. However, there's some hope, languages (like Haskell, Rust, etc) are experiments in what can be done to keep the type system expressive, sound, as well as productive.
-
-## The Pervasiveness of Type Systems
-
-There's a very compelling case to be made that type systems are given a different treatment depending on where they're used. C++'s Templating and TypeScript both use duck typing while Haskell has a nominal type system heavily based on Hindley–Milner type inference. Java and C hardly use inference at all and ask the developer to label their types in even the most obvious cases. Python shoves most of it's types into the run-time. These all seem like very different things and it may well be that any insight gained by understanding what unifies these type systems has a fleeting impact on the developement of any given software system.
-
-There's a lens through which this is a healthy way to look at things. When you learn a new language, the types are some part of the syntax and semantics. We don't typically look at common elements of syntax between languages and see any deeper meaning. Certainly the fact that so many languages use `{` and `}` is an artifact of history and doesn't offer some fundamental insight into the nature of programming languages.
-
-Perhaps it **should** be surprising that a language’s ad-hoc system for labelling values with types is best described/expressed with mathematics’ foundational building blocks. After all, the Types as seen in dependent type theory feel far removed from the <mark>int</mark>, <mark>long</mark>, <mark>float</mark>, <mark>double</mark>, <mark>Object</mark>, or <mark>SimpleBeanFactoryAwareAspectInstanceFactory</mark> as seen in Java. Perhaps it should also be surprising that all these seemingly different systems (so often developed entirely independently of one another) should end up being related in curious and interesting ways.
-
-**Here is my contention:** Insofar as they help developers, less expressive type systems can be seen as carving out little chunks of a grander underlying theory while leaving developers to reason the rest out on their own. More expressive type systems can capture or encode more abstract reasoning. Regardless of how directly usefull such lines of thinking are, it's enriching to think along these lines. 
-
-I’m reminded of how often I’ve seen and heard developers express that programming isn’t mathematics so much as it’s "*just logic*". The idea is that the exercise you’re engaged in while writing a program is much easier than, for example grade 11 Calculus. Instead, I suspect that — especially for shorter or simpler programs — the sorts of reasoning you invoke are much more foundational and much less abstract than some of the Math you’ve already learned. As different as it looks, a simple Agda program (for example, one that sorts a list) often just makes explicit the sort of reasoning a Python developer may implicitly perform while writing code.
-
-Across all the various general purpose languages, the logical building blocks by which you program don’t really change too much. Pretty much every language with a type system is using types to solve the same problem. Whether they realize it or not, they're attempting to embed some form of symbolic constructive reasoning in their language (so that it can be automatically checked). They do this (to varying degrees of success) to catch errors or improve productivity by localizing reasoning.
-
-That's an abstract claim, so I'll dig into a few examples.
