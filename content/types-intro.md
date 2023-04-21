@@ -56,7 +56,7 @@ That's rather vague; in programming languages types seem to be restrictions<sup>
 
 ## Motivating the use of types
 
-Lets jump into a simple (although contrived) example of how this might be helpful. Here's a simple function you often find in the opening chapters of a introduction to python book:
+Lets jump into a simple (although contrived) example using a less expressive type system to demonstrate how this might be helpful. Here's a simple function you might find in the opening chapters of an *Introduction to Python* book:
 
 ```Python
 def factorial(n):
@@ -150,7 +150,7 @@ class Color:
             return False
 ```
 
-Because `Color` is defined "just so", passing it to factorial will crash the server again. **Bummer**. You could solve this with some more code, though because factorial is used on the hot-path, your server's performance is suffering. Instead, you take the time to hunt down the known bugs and revert back to the more performant version of factorial. Then you write a comment explaining the function's per-condition.
+Because `Color` is defined "just so", passing it to factorial will crash the server again. **Bummer**. You could solve this with some more code, though because factorial is used on the hot-path, your server's performance is suffering. Instead, you take the time to hunt down the known bugs and revert back to the more performant version of factorial. Then you write a comment explaining the function's precondition.
 
 ```Python
 # !!!IMPORTANT!!! If you're reviewing code that calls this function, double and 
