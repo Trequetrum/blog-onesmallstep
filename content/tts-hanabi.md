@@ -1,5 +1,5 @@
 +++
-title = "My experience writing a Hanabi Mod for Tabletop Simulator"
+title = "Writing a Hanabi Mod for Tabletop Simulator"
 date = 2023-04-21
 draft = false
 
