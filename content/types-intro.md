@@ -14,7 +14,7 @@ keywords = "Types, Syntax, Semantics, Logic, Math, Foundation, Type Theory, Prog
 
 # Preface
 
-This is some of my meandering thoughts about **types**, which I'll argue represent the formal ways in which we can reason about text<sup>[1]</sup> as a program. It's a semi-philosophical look at some of the fundamental sorts of reasoning that computer scientists do. I don’t expect reading this will make you a better programmer, but it may give you a fresh perspective when approaching types and I hope it's a fun read regardless.
+This is some of my meandering thoughts about **types**, which I'll argue represent the formal ways in which we can reason about text <sup>[1]</sup> as a program. It's a semi-philosophical look at some of the fundamental sorts of reasoning that computer scientists do. I don’t expect reading this will make you a better programmer, but it may give you a fresh perspective when approaching types and I hope it's a fun read regardless.
 
 This is an attempt to write out my understanding of the topic and should be taken as such. I am not an expert on types and am likely to provide an incomplete or perhaps even entirely wrong understanding of some of these concepts. 
 
@@ -38,7 +38,7 @@ or a Rust file and see:
 let a: i32 = 5;
 ```
 
-`int` and `i32` are types and in this case and both denote a <mark>32-bit signed two's complement integer</mark>. The variable `a` is exactly one of `int`'s 2<sup>32</sup> (or 4294967296) possible inhabitants. There's some loose notion under which `a` denotes an element of `int` as though `int` were a set. If I had written `int a = 5.0,` I would have received a compilation error saying the expression is not well typed. The error would say something to the effect that a floating point number cannot be assigned to a variable meant to hold an integer.
+`int` and `i32` are types and in this case and both denote a {% emph() %}32-bit signed two's complement integer{% end %}. The variable `a` is exactly one of `int`'s 2<sup>32</sup> (or 4294967296) possible inhabitants. There's some loose notion under which `a` denotes an element of `int` as though `int` were a set. If I had written `int a = 5.0,` I would have received a compilation error saying the expression is not well typed. The error would say something to the effect that a floating point number cannot be assigned to a variable meant to hold an integer.
 
 At their core, types seem like a very simple, but frustratingly abstract thing. They have a somewhat liminal nature, existing in many forms directly in syntax — where rules inductively define well typed syntax — and also in the meta-language — where we leave it as an exercise to the reader to understand why some expressible syntax is not necessarily meaningful. 
 
@@ -186,17 +186,19 @@ Writing code knowing that future developers (including yourself) will be forced 
 This style of software design is certainly possible in an assembly language, but as the size of the codebase and the number of developers increases, such designs are hard to maintain. While jumping into a Haskell codebase and implementing some new feature is often daunting and difficult, it is also generally more difficult to do wrong since the compiler can perform exhaustiveness checks to ensure that your functions are total, that errors are handled, and that any new code type checks against everything else in the codebase.
 
 In languages without type *systems*, types still appear in the margins. Programmers writing assembly still work with basic types like:
-- <mark>boolean</mark>, 
-- <mark>string</mark>, 
-- <mark>integer</mark>, 
-- <mark>floating point number</mark>,  
+
+- {% emph() %}boolean{% end %}, 
+- {% emph() %}string{% end %}, 
+- {% emph() %}integer{% end %}, 
+- {% emph() %}floating point number{% end %},  
 and so on.
 
+
 They also work with more abstract types like: 
-- <mark>first and last name</mark>, 
-- <mark>recoverable errored socket connection</mark>, 
-- <mark>opened file handle</mark>, 
-- <mark>any data type that allows a structure-preserving mapping between pointers to heap allocated values paired with a function pointer that can compute such a mapping</mark>,  
+- {% emph() %}first and last name{% end %}, 
+- {% emph() %}recoverable errored socket connection{% end %}, 
+- {% emph() %}opened file handle{% end %}, 
+- {% emph() %}any data type that allows a structure-preserving mapping between pointers to heap allocated values paired with a function pointer that can compute such a mapping{% end %},  
 and so on.
 
 These types appear directly and/or obliquely in comments, notes, and design documents.
@@ -256,7 +258,7 @@ What sorts of meaning a type system can express varies wildly from language to l
 
 ### Shoving type information into the run-time
 
-**As aside for dynamic language enthusiasts**.
+**An aside for dynamic language enthusiasts**.
 
 You can put type information into the run-time of a program. 
 
@@ -345,7 +347,7 @@ There's a very compelling case to be made that type systems are given a differen
 
 There's a lens through which this is a healthy way to look at things. When you learn a new language, the types are some part of the syntax and semantics. We don't typically look at common elements of syntax between languages and see any deeper meaning. Certainly the fact that so many languages use `{` and `}` is an artifact of history and doesn't offer some fundamental insight into the nature of programming languages.
 
-Perhaps it **should** be surprising that a language’s ad-hoc system for labelling values with types is best described/expressed with mathematics’ foundational building blocks. After all, the Types as seen in dependent type theory feel far removed from the <mark>int</mark>, <mark>long</mark>, <mark>float</mark>, <mark>double</mark>, <mark>Object</mark>, or <mark>SimpleBeanFactoryAwareAspectInstanceFactory</mark> as seen in Java. Perhaps it should also be surprising that all these seemingly different systems (so often developed entirely independently of one another) should end up being related in curious and interesting ways.
+Perhaps it **should** be surprising that a language’s ad-hoc system for labelling values with types is best described/expressed with mathematics’ foundational building blocks. After all, the Types as seen in dependent type theory feel far removed from the {% emph() %}int{% end %}, {% emph() %}long{% end %}, {% emph() %}float{% end %}, {% emph() %}double{% end %}, {% emph() %}Object{% end %}, or {% emph() %}SimpleBeanFactoryAwareAspectInstanceFactory{% end %} as seen in Java. Perhaps it should also be surprising that all these seemingly different systems (so often developed entirely independently of one another) should end up being related in curious and interesting ways.
 
 **Here is my contention:** Insofar as they help developers, less expressive type systems can be seen as carving out little chunks of a grander underlying theory while leaving developers to reason the rest out on their own. More expressive type systems can capture or encode more abstract reasoning. Regardless of how directly useful such lines of thinking are, it's enriching to think along these lines. 
 

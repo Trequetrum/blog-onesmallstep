@@ -1,0 +1,7 @@
+{% set class_name = "pink-emph" %}
+{% if c and c == "blue" %}
+    {% set class_name = "blue-emph" %}
+{% endif %}
+<span class={{class_name}}>
+    {{ body | markdown(inline=true) | safe }}
+</span>

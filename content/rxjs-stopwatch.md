@@ -35,16 +35,16 @@ I'm also including it because I think it has some pedagogical merit for a beginn
 
 The crux of the problem is this: 
 
-- Our input is a stream that emits a series of "RUN/PAUSE" or "RESET" actions over an arbitrary span of time.
+- Our input is a stream that emits a series of {% emph(c="blue") %}"RUN/PAUSE"{% end %} or {% emph(c="blue") %}"RESET"{% end %} actions over an arbitrary span of time.
 - If the input stream `error`s or `complete`s, then so should the output. 
   - Once the output is done, all memory should be released to the GC — for example, there should be no ongoing timers.
 - The watch has two states:
-  - <mark>Running</mark>: The output should emit a number every `interval` milliseconds.
-  - <mark>Paused</mark>: There should be no output.
-- The watch starts <mark>Paused</mark> and switches state each time the source emits "RUN/PAUSE"
+  - {% emph() %}Running{% end %}: The output should emit a number every `interval` milliseconds.
+  - {% emph() %}Paused{% end %}: There should be no output.
+- The watch starts {% emph() %}Paused{% end %} and switches state each time the source emits {% emph(c="blue") %}"RUN/PAUSE"{% end %}
 - The Output's emissions are numbers:
   - The first number to be emitted is a zero
-  - If the source emits "RESET", the next number emitted is a zero
+  - If the source emits {% emph(c="blue") %}"RESET"{% end %}, the next number emitted is a zero
   - Otherwise, the emitted number is always the previous emitted number + 1.
 
 The most accurate solutions just use the system time. Doing so can avoid the sharp corners of the JS event loop. I think that for the sake of just learning and using RxJS, those concerns add incidental complexity. To that end, there's a relatively succinct solution you can implement by recursively calling `setTimeout`. For a third party auditing such code, understanding the mix of callbacks, `setTimeout()`, `clearTimeout()`, timestamp calculations and so on would not be trivial. We're hoping RxJS can modularize the logic such that a reader familiar with the library could reasonably understand it on a first or second reading. There shouldn't be too much logic that needs to be understood in the context of the broader solution, so that if you understand each part you naturally come to an understanding of the whole.

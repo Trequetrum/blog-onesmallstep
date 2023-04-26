@@ -22,14 +22,14 @@ Lua is a fast, light-weight, embeddable scripting language. It was designed for 
 
 ## Lua is Small 
 
-Both physically:
+{% emph() %}Both physically:{% end %}
 
 > The source contains around 30000 lines of C. Under 64-bit Linux, the Lua interpreter built with all standard Lua libraries takes 281K and the Lua library takes 468K. 
 > - Lua: About [(link)](http://www.lua.org/about.html)
 
-And conceptually: I felt like I had a grasp of both the language and it's standard library in an afternoon. Of course, as such things go, sometimes it feels like there's always a little more to learn. Lua does still have all the depth, nuance, and eccentricities of a general purpose programming language.
+{% emph() %}And conceptually:{% end %} I felt like I had a grasp of both the language and it's standard library in an afternoon. Of course, as such things go, sometimes it feels like there's always a little more to learn. Lua does still have all the depth, nuance, and eccentricities of a general purpose programming language.
 
-## Lua is (Relatively) Simple
+## Lua is Simple
 
 It offers relatively few abstractions and those that it does offer must be used explicitly.
 
@@ -39,7 +39,7 @@ In Lua, you have only anonymous functions full stop. (though you can get back a 
 
 As is standard for dynamically typed languages, Lua offers a small set of types and no means to define your own. Lua has — for the most part — leaned into this simplicity and avoided building any complex object/class/type hierarchies (though the option is there via matatables and metamethods). 
 
-Consider Lua's array-hashmap mashup type — tables:
+Consider Lua's array-hashmap mashup type — {% emph(c="blue") %}tables{% end %}:
 
 > Tables are the main (in fact, the only) data structuring mechanism in Lua, and a powerful one. We use tables to represent ordinary arrays, symbol tables, sets, records, queues, and other data structures, in a simple, uniform, and efficient way. Lua uses tables to represent packages as well.
 > - [Programming in Lua (link)](https://www.lua.org/pil/contents.html)

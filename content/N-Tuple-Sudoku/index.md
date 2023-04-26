@@ -50,7 +50,7 @@ One of the basic approaches to solving a Sudoku puzzle is to search each group (
 
 There are two approaches that allow you to mechanically find such subgroups. We’ll call these the *Naked constraint* and the *Hidden constraint*. 
   * If we discover these subgroups using the Naked constraint, we'll call the subgroup discovered a Naked Tuple. The other subgroup is implicitly just the rest of the group.
-  * If we discover these subgroups using the Hidden constraint, we'll call the subgroup discovered a Hidden Tuple. The other subgroup is, again, implicitly
+  * If we discover these subgroups using the Hidden constraint, we'll call the subgroup discovered a Hidden Tuple. The other subgroup is, again, implicitly the rest of the group.
 
 I define *Naked constraint* and *Hidden constraint* below (In **How do Tuples constrain a board?**), but it's enlightening to first build some intuition of Naked and Hidden Tuples. Seeing how to find each tuple and understanding that the two are actually duals of one another, further simplifies the definition of these constraints.
 
@@ -74,31 +74,29 @@ I define *Naked constraint* and *Hidden constraint* below (In **How do Tuples co
 
 You might find a naked tuple if you:
 
->1) Pick any set of options (They have some cardinality of size **n**) 
->2) Pick any group on the board. 
->3) If the set you picked is a superset of exactly **n** cells in that group, then those **n** cells form a Naked N-Tuple.
+1) Pick any set of options (They have some cardinality of size **n**) 
+2) Pick any group on the board. 
+3) If the set you picked is a superset of exactly **n** cells in that group, then those **n** cells form a Naked N-Tuple.
 
 You will find every naked tuple if you do this for:
 
->* Every combination of options that form a set (of which there are 511)
->* Every group (of which there are 27) 
+* Every combination of options that form a set (of which there are 511)
+* Every group (of which there are 27) 
 
 ## How to find a Hidden N-Tuple
 
-**Not Disjoint:** If the intersection of two sets is inhabited, then they are not disjoint. The intersection of two sets is just the set of elements they have in common.
-  * {5,6,7,8,9} and {1,3,5,7,9} are not disjoint because they have this intersection: {5,7,9}
-  * {1,2,3} and {4,5,6} are disjoint because their intersection is empty {}.
+**Not Disjoint:** If the intersection of two sets is inhabited, then they are not disjoint. The intersection of two sets is just the set of elements they have in common. `{5,6,7,8,9}` and `{1,3,5,7,9}` are not disjoint because they have this intersection: `{5,7,9}`. `{1,2,3}` and `{4,5,6}` are disjoint because their intersection is empty `{}`.
 
 You might find a hidden tuple if you:
 
->1) Pick any set of options (They have some cardinality of size **n**) 
->2) Pick any group on the board. 
->3) If the set you picked is not disjoint with exactly **n** cells in that group, then those **n** cells form a Naked N-Tuple in that group.
+1) Pick any set of options (They have some cardinality of size **n**) 
+2) Pick any group on the board. 
+3) If the set you picked is not disjoint with exactly **n** cells in that group, then those **n** cells form a Naked N-Tuple in that group.
 
 You will find every hidden tuple if you do this for:
 
->* Every combination of options that form a set (of which there are 511)
->* Every group (of which there are 27) 
+* Every combination of options that form a set (of which there are 511)
+* Every group (of which there are 27) 
 
 ## What do Naked and Hidden N-Tuples have in common?
 
@@ -403,7 +401,7 @@ Generated Actions:
   board[2] = 000100010 AND 000000010 = 000000010
 ```
 Generalized:
-```purescript
+```
   board[n] = board[n] AND cell
   where
   n is an index of interest
