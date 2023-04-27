@@ -171,7 +171,7 @@ Strictly speaking, no. They represent the same constraints on the board.
 
 **But**: when designing an algorithm smaller tuples are better. This is for a few reasons.
 
-1) If you look for small tuples first, you can narrow the search space while looking for larger tuples. For example: if the cells (2 {34}) & (8 {34}) are a 2-Tuple, then no other n-tuples of size 2, 3, 4, etc in the same group need to search the indices 2 or 8 nor the options 3 or 4. This doesn't work in reverse. Consider if cells (2 {3}) & (8 {34}) are a 2-Tuple, we still want to find the naked 1-tuple (2 {3}) since it would represent a constraint that removes the 3 from (8 {34}).
+1) If you look for small tuples first, you can narrow the search space while looking for larger tuples. For example: if the cells (2 {3,4}) & (8 {3,4}) are a 2-Tuple, then no other n-tuples of size 2, 3, 4, etc in the same group need to search the indices 2 or 8 nor the options 3 or 4. This doesn't work in reverse. Consider if cells (2 {3}) & (8 {3,4}) are a 2-Tuple, we still want to find the naked 1-tuple (2 {3}) since it would represent a constraint that removes the 3 from (8 {3,4}).
 2) Tuples can exist in more than one group at a time. If we find a 1-tuple in the first row, this is guaranteed to also be a 1-tuple in a column and a box (Every index has exactly 1 row, 1 column, and 1 box). In a 9x9 board, n-tuples of size 1 always have 3 groups, while n-tuples of size 2 and 3 may have up to 2 groups. Smaller tuples are better because they can be constraints for and narrow the search space in multiple groups at once.
 3) If you look for both Hidden and Naked tuples at once, you can stop looking after you've searched for n-tuples of size 4. Hidden Tuples of sizes 1 to 4 correspond to Naked Tuples of sizes 9 to 5 and vice versa (Naked Tuples of sizes 1 to 4 correspond to Hidden Tuples of sizes 9 to 5)
 
@@ -473,11 +473,15 @@ So while there arguments to be made about premature optimizations, here are some
 
 Remember when we iterated through all possible sets of options (integers 1 to 511)? The naive implementation is to iterate through them using their natural ordering under integers. 
 
-*Yeah, don't do that.* Instead, order this by the cardinality of possible sets. (Remember that the cardinality of a set is the number of 1s in its binary representation.)
+*Yeah, don't do that.* Instead, order this by the cardinality of the sets. (Remember that the cardinality of a set is the number of 1s in its binary representation.)
 
 For a board of size 9, that looks like this:
 
-1, 2, 4, 8, 16, 32, 64, 128, 256, 3, 5, 6, 9, 10, 12, 17, 18, 20, 24, 33, 34, 36, 40, 48, 65, 66, 68, 72, 80, 96, 129, 130, 132, 136, 144, 160, 192, 257, 258, 260, 264, 272, 288, 320, 384, [...etc, etc], 255, 383, 447, 479, 495, 503, 507, 509, 510, 511
+`1, 2, 4, 8, 16, 32, 64, 128, 256, 3, 5, 6, 9, 10, 12, 17, 18, 20, 24, 33, 34, 36, 40, 48, 65, 66, 68, 72, 80, 96, 129, 130, 132, 136, 144, 160, 192, 257, 258, 260, 264, 272, 288, 320, 384, [...etc, etc], 255, 383, 447, 479, 495, 503, 507, 509, 510, 511`
+
+It's easier to spot the cardinality of each set of options if the same sequence is written in binary:
+
+`000000001, 000000010, 000000100, 000001000, 000010000, 000100000, 001000000, 010000000, 100000000, 000000011, 000000101, 000000110, 000001001, 000001010, 000001100, 000010001, 000010010, 000010100, 000011000, 000100001, 000100010, 000100100, 000101000, 000110000, 001000001, 001000010, 001000100, 001001000, 001010000, 001100000, 010000001, 010000010, 010000100, 010001000, 010010000, 010100000, 011000000, 100000001, 100000010, 100000100, 100001000, 100010000, 100100000, 101000000, 110000000, [...etc, etc], 011111111, 101111111, 110111111, 111011111, 111101111, 111110111, 111111011, 111111101, 111111110, 111111111`
 
 Now searching for Tuples starts with the smallest sets of options and progresses to larger ones. Because of this ordering, if a tuple is found:
   * Options within the tuple can be ignored when searching for more tuples (Fewer possible sets of options to iterate through)
