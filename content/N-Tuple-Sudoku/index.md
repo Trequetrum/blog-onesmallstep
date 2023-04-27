@@ -12,27 +12,39 @@ toc = true
 keywords = "Algorithm, Programming, Sudoku, Puzzle, Solution"
 +++
 
-# Preamble
+# Sudoku notations
 
-This blog is to explain an algorithm that gets you some of the way toward solving a Sudoku. While I'm sure it's not entirely novel, I've not seen this algorithm explained/explored elsewhere so I will attempt to do so here.
+This blog entry assume the reader understands the rules of Sudoku.
 
-I do assume the reader understands the rules of Sudoku.
+When filling in a Sudoku, you may think of each cell on the board as being either {%emph()%}filled in{%end%} or {%emph()%}empty{%end%}. As puzzles becomes more advanced, it's common for people to add notations or take notes in some way. The notations used here describe each cell in a board as all the remaining possibilies for that cell.
+
+Consider the following board where only a {%emph(c="blue")%}**5**{%end%} in the middle is given. You can then notice that the cell's row, column, and box have all had all the {%emph(c="blue")%}**5**{% end %}s removed. The rest of the cells can all still have any possibility.
+
+{{ img(src="board-5.png" alt="Vocab Picture" w=404 h=404) }}
+
+Because this is not a proper Sudoku, we've annotated everything that we can logically deduce and yet we haven't solved the puzzle. For a proper Sudoku, you can keep deducing reasons for removing possibilies from cells until each cell has only a single possibility left. Once this is done, the puzzle is solved.
+
+This blog aims to explain an algorithm for removing possibilites from a Sudoku Puzzle. The technique will not solve every proper Sudoku, but it will fully solve most of the puzzles you might find in a sudoku book and can be easily combined with a brute force algorithm to solve the rest. If you look up Sudoku solving techniques online, this algorithm is a generalization of the naked and hidden pairs technique, but generalized for tuples of any size.
+
+We'll discuss the technique, then explore some ways to effeciently implement the technique via bit-masking.
 
 # Vocabulary
 
-Talking about Sudoku requires some vocabulary for which we'd better be on the same page (pun intended).   
+Talking about Sudoku requires some vocabulary for which we'd better be on the same page (pun intended).
+
 We'll go through some of that here.
 
-  * **Board:** A 9x9 (rank-3) Sudoku board is a collection of 81 cells where each cell belongs to exactly 1 row, 1 column, and 1 box.
-  * **Rank:** A Sudoku of rank n is an n<sup>2</sup>×n<sup>2</sup> square grid, subdivided into n<sup>2</sup> boxes (each of size n×n). There are n<sup>2</sup> options used to fill out the board.
-  * **Option:** can be represented by any symbols, though typically options are the numbers used to fill a Sudoku board. On a 9x9 board, they are elements of the set {1,2,3,4,5,6,7,8,9}
-  * **Index:** The name for a position on the board. On a 9x9 board, the set of indices are {0..80}
-  * **Cell:** An index and a set of options. The set of options for a given cell is an encoding of all the possible options that a position on a board may eventually take. If a cell contains the set {1,4,6,7,8}, that means there are constraints on the board such that any of the other options are invalid. A cell is both a position on a board and a **set** of options. For a 9x9 board, the cardinality (number of possible options) of a cell is between 1 and 9 (no empty set).
-  * **Forced/Solved Cell:** A cell whose set of options has a cardinality of 1. 
-  * **Group:** Predefined collection of cells (row, column, or box).
-  * **Row/Col/Box:** Names for the 3 groups of a typical Sudoku board
-  * **Peers:** cells (specifically indices) that share a group
-<br><br>
+  * {%emph()%}**Board:**{%end%} A 9x9 (rank-3) Sudoku board is a collection of 81 cells where each cell belongs to exactly 1 row, 1 column, and 1 box.
+  * {%emph()%}**Rank:**{%end%} A Sudoku of rank n is an n<sup>2</sup>×n<sup>2</sup> square grid, subdivided into n<sup>2</sup> boxes (each of size n×n). There are n<sup>2</sup> options used to fill out the board.
+  * {%emph()%}**Option:**{%end%} can be represented by any symbols, though typically options are the numbers used to fill a Sudoku board. On a 9x9 board, they are elements of the set `{1,2,3,4,5,6,7,8,9}`
+  * {%emph()%}**Index:**{%end%} The name for a position on the board. On a 9x9 board, the set of indices are `{0..80}`
+  * {%emph()%}**Cell:**{%end%} An index and a set of options. The set of options for a given cell is an encoding of all the possible options that a position on a board may eventually take. If a cell contains the set `{1,4,6,7,8}`, that means there are constraints on the board such that any of the other options are invalid. A cell is both a position on a board and a **set** of options. For a 9x9 board, the cardinality (number of possible options) of a cell is between 1 and 9 (no empty set).
+  * {%emph()%}**Forced/Solved Cell:**{%end%} A cell whose set of options has a cardinality of 1.
+  * {%emph()%}**Group:**{%end%} Predefined collection of cells (row, column, or box)
+    * {%emph()%}**Row/Col/Box:**{%end%} Names for the 3 groups of a typical Sudoku board
+    * {%emph()%}**Peers:**{%end%} cells (specifically indices) that share a group
+
+Here is an image highlighting some of these terms:
 
 {{ img(src="full-board-labels.png" alt="Vocab Picture" w=600 h=466) }}
 
@@ -54,6 +66,10 @@ There are two approaches that allow you to mechanically find such subgroups. We�
 
 I define *Naked constraint* and *Hidden constraint* below (In **How do Tuples constrain a board?**), but it's enlightening to first build some intuition of Naked and Hidden Tuples. Seeing how to find each tuple and understanding that the two are actually duals of one another, further simplifies the definition of these constraints.
 
+### N-Tuple examples
+
+{{ img(src="naked-example.png" alt="Visual Example" w=1113 h=581) }}
+
 ### Naked N-Tuple described examples
 
   * **Naked 1-Tuple:** (Singleton) There is a cell in this group that has only 1 option (the option 2). Therefore, all other cells in this group cannot contain a 2
@@ -70,7 +86,7 @@ I define *Naked constraint* and *Hidden constraint* below (In **How do Tuples co
 
 ## How to find a Naked N-Tuple.
 
-**Superset:** A set of options **α** is a superset of another set **β** if every option in **β** is also an option in **α**. So the set `{1,2,3,4,5,6,7,8,9}` is a superset of every other possible set of options. The set `{8}` is only a superset of `{8}` and `{}` (the empty set). Since cells cannot have a cardinality of zero, that means `{8}` is only a superset of cells that are solved with the option 8.
+{%emph()%}**Superset:**{%end%} A set of options **α** is a superset of another set **β** if every option in **β** is also an option in **α**. So the set `{1,2,3,4,5,6,7,8,9}` is a superset of every other possible set of options. The set `{8}` is only a superset of `{8}` and `{}` (the empty set). Since cells cannot have a cardinality of zero, that means `{8}` is only a superset of cells that are solved with the option 8.
 
 You might find a naked tuple if you:
 
@@ -85,7 +101,7 @@ You will find every naked tuple if you do this for:
 
 ## How to find a Hidden N-Tuple
 
-**Not Disjoint:** If the intersection of two sets is inhabited, then they are not disjoint. The intersection of two sets is just the set of elements they have in common. `{5,6,7,8,9}` and `{1,3,5,7,9}` are not disjoint because they have this intersection: `{5,7,9}`. `{1,2,3}` and `{4,5,6}` are disjoint because their intersection is empty `{}`.
+{%emph()%}**Not Disjoint:**{%end%} If the intersection of two sets is inhabited, then they are not disjoint. The intersection of two sets is just the set of elements they have in common. `{5,6,7,8,9}` and `{1,3,5,7,9}` are not disjoint because they have this intersection: `{5,7,9}`. `{1,2,3}` and `{4,5,6}` are disjoint because their intersection is empty `{}`.
 
 You might find a hidden tuple if you:
 

@@ -16,6 +16,8 @@ keywords = "Types, Syntax, Semantics, Logic, Math, Foundation, Type Theory, Prog
 
 This is some of my meandering thoughts about **types**, which I'll argue represent the formal ways in which we can reason about text <sup>[1]</sup> as a program. It's a semi-philosophical look at some of the fundamental sorts of reasoning that computer scientists do. I don’t expect reading this will make you a better programmer, but it may give you a fresh perspective when approaching types and I hope it's a fun read regardless.
 
+If most of your experience with programming has by and large been with dynamically typed languages (Like Python or JavaScript) or languages with relatively simple type systems (like C++ or Java), and you're looking to expand your programming repertoire with one of the statically typed functional languages then I hope the {%emph()%}10000 foot view{%end%} 
+
 This is an attempt to write out my understanding of the topic and should be taken as such. I am not an expert on types and am likely to provide an incomplete or perhaps even entirely wrong understanding of some of these concepts. 
 
 The plan is to update this as my understanding evolves.
@@ -68,7 +70,7 @@ def factorial(n):
 
 If you pass this function a negative number, it will never hit the base-case of `n == 0` and will instead recurses endlessly, hanging the program and burning CPU cycles until something kills the process. In truth, Python has a recursion limit which it will eventually reach in this case, though if you re-write this function using a while loop instead of recursion you lose even that extra bit of safety.
 
-Consider a relatively large, long-lived program. Say a web-server responding to queries. It's responding to millions or requests per day, but unfortunately, roughly once per month the server crashes when `factorial` is called. There is some relatively rare sequence of events that results in factorial being called with some value for which it isn't well behaved. You're on a time crunch and you know your server is robust against throwing errors so you write a bit of code to solve the problem:
+Consider a relatively large, long-lived program. Say a web-server responding to queries. It's responding to millions of requests per day, but unfortunately, roughly once per month the server crashes when `factorial` is called. You deduce that there is some relatively rare sequence of events that results in `factorial` being called with some value for which it isn't well behaved. You're on a time crunch and you know your server is robust against throwing errors so you write a bit of code to solve the problem:
 
 ```Python
 def factorial(n):
@@ -150,7 +152,7 @@ class Color:
             return False
 ```
 
-Because `Color` is defined "just so", passing it to factorial will crash the server again. **Bummer**. You could solve this with some more code, though because factorial is used on the hot-path, your server's performance is suffering. Instead, you take the time to hunt down the known bugs and revert back to the more performant version of factorial. Then you write a comment explaining the function's precondition.
+Because `Color` is defined "just so", passing it to factorial will crash the server again. **Bummer**. You could solve this with some more code, though because factorial is used on the hot-path, your server's performance is suffering. Instead, you take the time to hunt down the known bugs. YThen, because response time matters, you revert back to the more performant version of factorial. Then you write a comment explaining the function's precondition.
 
 ```Python
 # !!!IMPORTANT!!! If you're reviewing code that calls this function, double and 
@@ -162,7 +164,7 @@ def factorial(n):
     return n * factorial(n-1)
 ```
 
-With a hundred developers working on the code base, the best you can do is cross your fingers and hope everybody understands how to call this function? Well, not really. It turns out that a type system can solve this problem statically without any performance penalty for the response time of your server. Here's how you might port this function to rust:
+With a hundred developers working on the code base, is it the case that the best you can do is cross your fingers and hope everybody understands how to call this function? Well, not really. It turns out that a type system can solve this problem statically without any performance penalty (for the response time of your server). Here's how you might port this function to rust:
 
 ```Rust
 fn factorial(n: u32) -> u32 {
@@ -174,16 +176,20 @@ fn factorial(n: u32) -> u32 {
 }
 ```
 
-This signature (`fn:(u32) -> u32`) effectively says "calling factorial with a positive integer will return a positive integer, calling it with any other value is undefined behaviour and should be avoided." Alone, this isn't any better than a comment, fortunately Rust comes paired with a type checker that is able to check every invocation of `factorial` in the code for your server and confidently assure you that none of the hundred developers working on the code base has accidentally invoked `factorial` with any other value. This incurs a penalty during compilation, but it doesn't affect the run-time of your program and it ensures that certain bugs never appear in the compiled artifact.
+This signature (`fn:(u32) -> u32`) effectively says "calling factorial with a positive integer will return a positive integer, calling it with any other value is undefined behaviour and should be avoided." Alone, this isn't any better than a comment, fortunately Rust comes paired with a type checker that is able to check every invocation of `factorial` in the code for your server and confidently assure you that none of the hundred developers working on the code base has accidentally invoked `factorial` with any other {%emph()%}type{%end%} of value. This incurs a penalty during compilation, but it doesn't affect the run-time of your program and it ensures that certain bugs never appear in the compiled artifact.
 
-For `factorial`, this is only a small win. After all the name seems descriptive enough that it feels quite unlikely a developer would misuse it. It takes relatively few building blocks to form the foundation for surprisingly robust type-level systems. By which I mean design patterns and software architectures that can be encoded (and enforced) at least in part in the language itself using its type system. For instance, Rust's type system is expressive enough to encode an SQL schema and ensure that any statically written query does not compile if it doesn't meet the schema, it can also automaticaly generate code that checks dynamic queries at runtime. You can generate these types automatically at compile time by querying your SQL server for the most up to date schema. Those types can be available across the entire program meaning that information about whether some value has been checked against the schema for correctness can be encoded in it's type and passed across isolated subsystems without the fear that it hasn't been sanitised and without performing the sort of "shot-gun validation" in which values are checked everywhere in the hopes that every error is caught somewhere.
+For `factorial`, this is only a small win. After all the name seems descriptive enough that it feels quite unlikely a developer would misuse it. While I agree that this is a contrived example, I hope this blog will convince you that it takes relatively few building blocks to form the foundation for surprisingly robust type-level systems. There are design patterns and software architectures that can be encoded (and enforced) at least in part in the language itself using its type system. 
+
+For instance, Rust's type system is expressive enough to encode an SQL schema and ensure that any statically written query does not compile if it doesn't meet the schema, it can also automaticaly generate code that checks dynamic queries at runtime. You can generate these types automatically at compile time by querying your SQL server for the most up to date schema. Those types can be available across the entire program meaning that information about whether some value has been checked against the schema for correctness can be encoded in it's type and passed across isolated subsystems without the fear that it hasn't been sanitised and without performing the sort of "shot-gun validation" in which values are checked everywhere in the hopes that every error is caught somewhere.
 
 Writing code knowing that future developers (including yourself) will be forced to meet its pre-conditions is generally liberating. You can push the responsibility for type safety backwards onto callers. Conversly, you can perform some computation to parse a less percise representation into a more percise one knowing that developers writting downstream code will never need to audit the program to be sure a value meets certain criteria.
 
 > In other words, write functions on the data representation you wish you had, not the data representation you are given. The design process then becomes an exercise in bridging the gap, often by working from both ends until they meet somewhere in the middle.
 > - Alexis King — [Parse, don’t validate (link)](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/)
 
-This style of software design is certainly possible in an assembly language, but as the size of the codebase and the number of developers increases, such designs are hard to maintain. While jumping into a Haskell codebase and implementing some new feature is often daunting and difficult, it is also generally more difficult to do wrong since the compiler can perform exhaustiveness checks to ensure that your functions are total, that errors are handled, and that any new code type checks against everything else in the codebase.
+This style of software design is certainly possible in an assembly language, but as the size of the codebase and the number of developers increases, such designs are hard to maintain. The problem is that every time you update (for new feature or bug fix) your codebase, 
+
+While jumping into a Haskell codebase and implementing some new feature is often daunting and difficult, it is also generally more difficult to do wrong since the compiler can perform exhaustiveness checks to ensure that your functions are total, that errors are handled, and that any new code type checks against everything else in the codebase.
 
 In languages without type *systems*, types still appear in the margins. Programmers writing assembly still work with basic types like:
 
