@@ -465,7 +465,7 @@ We can use types to describe an action like this is purescript:
 
 ## Algorithm optimizations
 
-Checking a rank-3 board for every possible naked or hidden tuple requires `124,173 (511 * 27 * 9)` bitwise operations. On most modern CPUs, that takes a few microseconds (I measured this at 31μs). At such small numbers, the cost of computing tuples will be dwarfed by the cost of cash misses while reading from and writing to memory. I found that implementing optimizations in PureScript offered immediate benefits, but trying the same thing with my Rust was less successful. My guess for why (Without digging into the generated assembly) is that any optimization that might invalidate cash locality is a problem.
+Checking a rank-3 board for every possible naked or hidden tuple requires `248,346 (511 * 27 * 9 * 2)` bitwise operations. On most modern CPUs, that takes a few microseconds (I measured this at 62μs). At such small numbers, the cost of computing tuples will be dwarfed by the cost of cash misses while reading from and writing to memory. I found that implementing optimizations in PureScript offered immediate benefits, but trying the same thing with my Rust implementaion was trickier. My guess for why (Without digging into the generated assembly) is that any optimization that might invalidate cash locality is a problem.
 
 So while there arguments to be made about premature optimizations, here are some things you can notice about this algorithm that may lead to optimizations if done carefully (and bench-marked, etc). Earlier, when we said smaller tuples where better, these are optimizations that witnesses that.
 
