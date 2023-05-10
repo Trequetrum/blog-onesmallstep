@@ -12,13 +12,77 @@ toc = true
 keywords = "Types, Syntax, Semantics, Logic, Math, Foundation, Type Theory, Programming, Language"
 +++
 
-# Preface
+# Intro
 
 This is some of my meandering thoughts about **types**, which I'll argue represent the formal ways in which we can reason about text <sup>[1]</sup> as a program. It's a semi-philosophical look at some of the fundamental sorts of reasoning that computer scientists do. I don’t expect reading this will make you a better programmer, but it may give you a fresh perspective when approaching types and I hope it's a fun read regardless.
 
-If most of your experience with programming has by and large been with dynamically typed languages (Like Python or JavaScript) or languages with relatively simple type systems (like C++ or Java), and you're looking to expand your programming repertoire with one of the statically typed functional languages then I hope the {%emph()%}10000 foot view{%end%} 
+If most of your experience with programming has by and large been with dynamically typed languages (Like Python or JavaScript) or languages with relatively simple type systems (like C or Java), and you're looking to expand your programming repertoire with one of the statically typed functional languages then I hope the {%emph()%}10000 foot view{%end%} provided here will offer some background understanding and motivation.
 
-This is an attempt to write out my understanding of the topic and should be taken as such. I am not an expert on types and am likely to provide an incomplete or perhaps even entirely wrong understanding of some of these concepts. 
+My feeling is that a proper deep understanding of types and types systems comes from applying these concepts in a project. The idea here is to touch on some interesting facets of the topic that aren't nessesary to know but which may help by just being interesting. 
+
+Lets talk about type systems: for any touring complete language, what is computable doesn't change. Arguments for and against languages and language features tend to reduce to {%emph()%}ergonomics{%end%}, {%emph()%}performance{%end%}, and {%emph()%}correctness{%end%}.
+
+{%aside()%}
+## *Python Iterators*
+
+Let's consider and assess Python's iterators as a language feature.
+
+### Example
+**Without iterators:**
+```python
+i = 0
+while i < len(mylist):
+  print(mylist[i])
+  i += 1
+```
+**With iterators:**
+```python
+for x in mylist:
+  print(x)
+```
+
+### Comparison:
+Despite the fact that both programs compute the same thing, Python iterators seem pretty good:
+- <span class="pink-emph">Ergonomics:</span> This is always subjective, but let's call a spade a spade. The iterator is easier to read and write. Sure, you have to learn some bespoke syntax, but you can communicate something about the intent of the program here. It's nice to not have to manage indices and such too.
+- <span class="pink-emph">Performance:</span> In general, iterator and list-index based approaches have similar performance. Once you factor in optimizations that Python's just in time compilation can perform, iterators save both time and space.
+- <span class="pink-emph">Correctness:</span> For starters the famous "off by 1 error" just isn't possible with iterators. There's also a more amorphous style of correctness here. Developers who use iterators are more likely to structure programs in such a way that they don't require indices. This means, say, iterating over pairs rather than indexing `mylist[i + 1]` where the sharp edges are handled by the interator (a battle tested library) rather than the developer each and every time they use the abstraction.
+{%end%}
+
+When viewed under this lens, whether or not **Type Systems** are good depends on the specific system in question.
+
+{%emph()%}**Ergonomics:**{%end%}
+
+- {%emph(c="blue")%}Python:{%end%} On the good side, dynamic typing makes it feel like you're writing untyped code, but allows "fail fast" development cycle since type errors still show up as errors at runtime. If you're looking to do some computation for a specific known input — for example: data exploration — the ergonomics are hard to beat.
+
+    On the bad side, it's exceedingly difficult to look at any significant amount of dynamically typed code and understand where errors might be thrown (some significant percent of type checks are redundant but some may be part of the expect/desired control flow of a program) which means extensive testing.
+
+- {%emph(c="blue")%}Haskell:{%end%} On the good side, the type system typically makes it clear when and where code performs effects (everything from fallible code, to reading from the file system) so it's easy to see and audit possible points of failure. The type system also acts as a domain specific language for data modelling so the surface syntax can express/describe sets of values easily. 
+
+    On the bad side, this often forces you to make choices about the shape of data before you're ready. Since how data is modeled directly affects the code you write, both prototyping and certain refactoring may take longer.
+
+{%emph()%}**Performance:**{%end%}
+
+- {%emph(c="blue")%}Python:{%end%} Dynamic type systems come at a cost in performance. Often, even the potential for an error can have performance impacts beyond the runtime type check itself (which will often be redundant).
+
+- {%emph(c="blue")%}Haskell:{%end%} Advanced type systems make certain styles of coding very ergonomic and easy to do. Haskell's functional dependencies are implemented via dictionary passing which is great for keeping code generic/general/dynamic but has a cost. 
+
+    That said, unlike dynamic type systems where the cost cannot be avoided, you can write extremely performant Haskell. When writing code to compete on a benchmark, Haskell is often competitive with C. The more expressive they are, the more Static type systems give compilers information about programmer intent, helping compilers perform some extremely impressive optimizations.
+
+{%emph()%}**Correctness:**{%end%} 
+
+- {%emph(c="blue")%}Python:{%end%} While it's really hard to write large bug-free programs in Python, its still significantly easier than in untyped assembly. The runtime type checks make testing and experimenting easy.
+
+- {%emph(c="blue")%}Haskell:{%end%} Haskell is famous for creating servers with close to zero downtime or utilities that get used for decades without ever registering an error. How much these stories are exaggerated is unclear. It's also not clear how much such feats are due to an impressive type system vs how much they're due to impressive developers. In my personal experience, I write fewer bugs with Haskell.
+
+- Correctness is the reason Type Systems were invented and the reason there are no high level languages without a type system. While ergonomics and performance have pros and cons, type systems unambiguously help with software correctness. 
+
+I have a bias, I think any time spent learning type theory gets paid back an order of magnitude later. Types are a little bit "pay as you go" in that you can can generally define a python-style {%emph()%}"This Type Can Be Any Number of things"{%end%} type in a type system and then basically program as though you're in a dynamic language. This means they could in theory work as a "use them only where they're helpful" language feature. I say that, but the ergonomics would be horendous. You would be required to do all the fun bookkeeping python does for you, like every time you try to use a value add a possible error "If this isn't the right sort of thing, throw a type error". It would get tedious and people never do this, but it's worth mentioning. Everyone has a "javascript can do this weird wacky thing because it's dynamic, you can't write it this way in rust!" story and while nobody would want to make explicit what `V8` is doing on behalf of the programmer for that wacky trick, they certainly could if pushed to it.
+
+In many ways Type's relationship to code is hinted to most clearly in assembly. Python has built up an entire system by which it wraps every value with runtime type information and then incessantly checks them every step along the way. Assembly is so hard exactly because you need to always remember which registers hold what sorts of values and whether those values can currently be used with any given operations. There's often no stack trace when you're wrong, just baffling output. It's python, plus anytime you want to debug anything you immediately get a headache. As a developer, you must create robust understanding of the code where 99% of that work amounts to understanding what the `32bits` behind that `a` are meant to denote at this moment in time. Assembly programmers must be VERY good a type-level reasoning exactly because they have no external support in that endeavour.
+
+Most everyone seems to have agreed that explicit types are better, but there's a schism between people who think type checking should be dynamic vs those who think it should be static. 
+
+ **BUT!** they're the sauce that makes programming work. Or... something like that. Lend me your ~~ear~~ eyes, this is an attempt to write out my understanding of the topic and should be taken as such. I am not an expert on types and am likely to provide an incomplete or perhaps even entirely wrong understanding of some of these concepts. 
 
 The plan is to update this as my understanding evolves.
 
@@ -44,7 +108,12 @@ let a: i32 = 5;
 
 At their core, types seem like a very simple, but frustratingly abstract thing. They have a somewhat liminal nature, existing in many forms directly in syntax — where rules inductively define well typed syntax — and also in the meta-language — where we leave it as an exercise to the reader to understand why some expressible syntax is not necessarily meaningful. 
 
-That's rather vague; in programming languages types seem to be restrictions<sup>[1]</sup> on the symbolic construction of a program. For example, this can be seen as restrictions on which values can be assigned to a variable, passed to a function, appended to a list, and so on.
+That's rather vague; in programming languages types seem to be restrictions<sup>[1]</sup> on the symbolic construction of a program. For example, this can be seen as restrictions on which values can be assigned to a variable, passed to a function, appended to a list, and so on. I dunno, consider the following program
+
+```rust
+
+```
+
 
 ----
 
@@ -68,7 +137,7 @@ def factorial(n):
     return n * factorial(n-1)
 ```
 
-If you pass this function a negative number, it will never hit the base-case of `n == 0` and will instead recurses endlessly, hanging the program and burning CPU cycles until something kills the process. In truth, Python has a recursion limit which it will eventually reach in this case, though if you re-write this function using a while loop instead of recursion you lose even that extra bit of safety.
+If you pass this function a negative number, it will never hit the base-case of `n == 0` and will instead recurse endlessly, hanging the program and burning CPU cycles until something kills the process. In truth, Python has a recursion limit which it will eventually reach in this case, though if you re-write this function using a while loop instead of recursion you lose even that extra bit of safety.
 
 Consider a relatively large, long-lived program. Say a web-server responding to queries. It's responding to millions of requests per day, but unfortunately, roughly once per month the server crashes when `factorial` is called. You deduce that there is some relatively rare sequence of events that results in `factorial` being called with some value for which it isn't well behaved. You're on a time crunch and you know your server is robust against throwing errors so you write a bit of code to solve the problem:
 
@@ -152,7 +221,7 @@ class Color:
             return False
 ```
 
-Because `Color` is defined "just so", passing it to factorial will crash the server again. **Bummer**. You could solve this with some more code, though because factorial is used on the hot-path, your server's performance is suffering. Instead, you take the time to hunt down the known bugs. YThen, because response time matters, you revert back to the more performant version of factorial. Then you write a comment explaining the function's precondition.
+Because `Color` is defined "just so", passing it to factorial will crash the server again. **Bummer**. You could solve this with some more code, though because factorial is used on the hot-path, your server's performance is suffering. Instead, you take the time to hunt down the known bugs. Then, because response time matters, you revert back to the more performant version of factorial. Then you write a comment explaining the function's precondition.
 
 ```Python
 # !!!IMPORTANT!!! If you're reviewing code that calls this function, double and 
@@ -180,9 +249,9 @@ This signature (`fn:(u32) -> u32`) effectively says "calling factorial with a po
 
 For `factorial`, this is only a small win. After all the name seems descriptive enough that it feels quite unlikely a developer would misuse it. While I agree that this is a contrived example, I hope this blog will convince you that it takes relatively few building blocks to form the foundation for surprisingly robust type-level systems. There are design patterns and software architectures that can be encoded (and enforced) at least in part in the language itself using its type system. 
 
-For instance, Rust's type system is expressive enough to encode an SQL schema and ensure that any statically written query does not compile if it doesn't meet the schema, it can also automaticaly generate code that checks dynamic queries at runtime. You can generate these types automatically at compile time by querying your SQL server for the most up to date schema. Those types can be available across the entire program meaning that information about whether some value has been checked against the schema for correctness can be encoded in it's type and passed across isolated subsystems without the fear that it hasn't been sanitised and without performing the sort of "shot-gun validation" in which values are checked everywhere in the hopes that every error is caught somewhere.
+For instance, Rust's type system is expressive enough to encode an SQL schema and ensure that any statically written query does not compile if it doesn't meet the schema, it can also automatically generate code that checks dynamic queries at runtime. You can generate these types automatically at compile time by querying your SQL server for the most up to date schema. Those types can be available across the entire program meaning that information about whether some value has been checked against the schema for correctness can be encoded in it's type and passed across isolated subsystems without the fear that it hasn't been sanitised and without performing the sort of "shot-gun validation" in which values are checked everywhere in the hopes that every error is caught somewhere.
 
-Writing code knowing that future developers (including yourself) will be forced to meet its pre-conditions is generally liberating. You can push the responsibility for type safety backwards onto callers. Conversly, you can perform some computation to parse a less percise representation into a more percise one knowing that developers writting downstream code will never need to audit the program to be sure a value meets certain criteria.
+Writing code knowing that future developers (including yourself) will be forced to meet its preconditions is generally liberating. You can push the responsibility for type safety backwards onto callers. Conversely, you can perform some computation to parse a less precise representation into a more precise one knowing that developers writing downstream code will never need to audit the program to be sure a value meets certain criteria.
 
 > In other words, write functions on the data representation you wish you had, not the data representation you are given. The design process then becomes an exercise in bridging the gap, often by working from both ends until they meet somewhere in the middle.
 > - Alexis King — [Parse, don’t validate (link)](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/)
