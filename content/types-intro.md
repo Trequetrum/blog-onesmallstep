@@ -20,12 +20,20 @@ If most of your experience with programming has by and large been with dynamical
 
 My feeling is that a proper deep understanding of types and types systems comes from applying these concepts in a project. The idea here is to touch on some interesting facets of the topic that aren't nessesary to know but which may help by just being interesting. 
 
-Lets talk about type systems: for any touring complete language, what is computable doesn't change. Arguments for and against languages and language features tend to reduce to {%emph()%}ergonomics{%end%}, {%emph()%}performance{%end%}, and {%emph()%}correctness{%end%}.
+Lend me your ~~ear~~ eyes, this is an attempt to write out my understanding of the topic and should be taken as such. I am not an expert on types and am likely to provide an incomplete or perhaps even entirely wrong understanding of some of these concepts. 
+
+The plan is to update this as my understanding evolves.
+
+<sup>[1]</sup> Any data ~~structure~~ capable of encoding the structure of a program
+
+# Type Systems as a Language Feature
+
+For any touring complete language, what is computable doesn't change. While there are other reasons to prefer a language or language feature, arguments for and against genderally can be reduce to arguements about {%emph()%}ergonomics{%end%}, {%emph()%}performance{%end%}, and {%emph()%}correctness{%end%}.
 
 {%aside()%}
 ## *Python Iterators*
 
-Let's consider and assess Python's iterators as a language feature.
+As an aside, let's consider and assess Python's iterators as a language feature.
 
 ### Example
 **Without iterators:**
@@ -41,24 +49,28 @@ for x in mylist:
   print(x)
 ```
 
-### Comparison:
+### Assessment:
 Despite the fact that both programs compute the same thing, Python iterators seem pretty good:
 - <span class="pink-emph">Ergonomics:</span> This is always subjective, but let's call a spade a spade. The iterator is easier to read and write. Sure, you have to learn some bespoke syntax, but you can communicate something about the intent of the program here. It's nice to not have to manage indices and such too.
 - <span class="pink-emph">Performance:</span> In general, iterator and list-index based approaches have similar performance. Once you factor in optimizations that Python's just in time compilation can perform, iterators save both time and space.
 - <span class="pink-emph">Correctness:</span> For starters the famous "off by 1 error" just isn't possible with iterators. There's also a more amorphous style of correctness here. Developers who use iterators are more likely to structure programs in such a way that they don't require indices. This means, say, iterating over pairs rather than indexing `mylist[i + 1]` where the sharp edges are handled by the interator (a battle tested library) rather than the developer each and every time they use the abstraction.
+
+While we cannot say that Python's iterators are irreproachably praiseworthy, it seems easy to argue that they are a good language feature for Python.
 {%end%}
 
-When viewed under this lens, whether or not **Type Systems** are good depends on the specific system in question.
+When viewed under this lens, whether or not **Type Systems** are good depends on the specific system in question. What can be said quite generally is that {%emph()%}correctness{%end%} is the reason Type Systems were invented and the reason there are no high level languages without a type system. While ergonomics and performance have pros and cons, type systems unambiguously help with software correctness.
+
+Here I'll include a fairly high-level assesment of Python and Haskell's type systems. I chose these languages because they're both very well known and their type systems are radically different from other another.
 
 {%emph()%}**Ergonomics:**{%end%}
 
 - {%emph(c="blue")%}Python:{%end%} On the good side, dynamic typing makes it feel like you're writing untyped code, but allows "fail fast" development cycle since type errors still show up as errors at runtime. If you're looking to do some computation for a specific known input — for example: data exploration — the ergonomics are hard to beat.
 
-    On the bad side, it's exceedingly difficult to look at any significant amount of dynamically typed code and understand where errors might be thrown (some significant percent of type checks are redundant but some may be part of the expect/desired control flow of a program) which means extensive testing.
+    On the bad side, it's exceedingly difficult to look at any significant amount of dynamically typed code and understand where errors might be thrown (some significant percent of type checks are redundant but some may be part of the expected/desired control flow of a program) which means extensive testing.
 
-- {%emph(c="blue")%}Haskell:{%end%} On the good side, the type system typically makes it clear when and where code performs effects (everything from fallible code, to reading from the file system) so it's easy to see and audit possible points of failure. The type system also acts as a domain specific language for data modelling so the surface syntax can express/describe sets of values easily. 
+- {%emph(c="blue")%}Haskell:{%end%} On the good side, the type system typically makes it clear when and where code performs effects (everything from fallible code, to reading from the file system) so it's easy to see and audit possible points of failure. The type system also acts as a domain specific language for data modelling so the surface syntax can express/describe sets of values easily. This also lets Haskell's compiler generate boilerplate on behalf of the developer. 
 
-    On the bad side, this often forces you to make choices about the shape of data before you're ready. Since how data is modeled directly affects the code you write, both prototyping and certain refactoring may take longer.
+    On the bad side, this often forces you to make choices about the shape of data before you're ready. Since how data is modeled directly affects the code you write, both prototyping and certain classes of refactoring may take longer. While it sometimes elimates boilerplate, Haskell's type system can also feel like the cause of boilerplate or code bloat.
 
 {%emph()%}**Performance:**{%end%}
 
@@ -66,7 +78,7 @@ When viewed under this lens, whether or not **Type Systems** are good depends on
 
 - {%emph(c="blue")%}Haskell:{%end%} Advanced type systems make certain styles of coding very ergonomic and easy to do. Haskell's functional dependencies are implemented via dictionary passing which is great for keeping code generic/general/dynamic but has a cost. 
 
-    That said, unlike dynamic type systems where the cost cannot be avoided, you can write extremely performant Haskell. When writing code to compete on a benchmark, Haskell is often competitive with C. The more expressive they are, the more Static type systems give compilers information about programmer intent, helping compilers perform some extremely impressive optimizations.
+    That said, unlike dynamic type systems where the cost cannot be avoided, you can write extremely performant Haskell. When writing code to compete on a benchmark, Haskell is often competitive with C. The more expressive they are, the more Static Type Systems give compilers information about programmer intent, helping compilers perform some extremely impressive optimizations.
 
 {%emph()%}**Correctness:**{%end%} 
 
@@ -74,21 +86,13 @@ When viewed under this lens, whether or not **Type Systems** are good depends on
 
 - {%emph(c="blue")%}Haskell:{%end%} Haskell is famous for creating servers with close to zero downtime or utilities that get used for decades without ever registering an error. How much these stories are exaggerated is unclear. It's also not clear how much such feats are due to an impressive type system vs how much they're due to impressive developers. In my personal experience, I write fewer bugs with Haskell.
 
-- Correctness is the reason Type Systems were invented and the reason there are no high level languages without a type system. While ergonomics and performance have pros and cons, type systems unambiguously help with software correctness. 
+When discussions about Type Systems materialize online, I would venture so far as to generalize that:
 
-I have a bias, I think any time spent learning type theory gets paid back an order of magnitude later. Types are a little bit "pay as you go" in that you can can generally define a python-style {%emph()%}"This Type Can Be Any Number of things"{%end%} type in a type system and then basically program as though you're in a dynamic language. This means they could in theory work as a "use them only where they're helpful" language feature. I say that, but the ergonomics would be horendous. You would be required to do all the fun bookkeeping python does for you, like every time you try to use a value add a possible error "If this isn't the right sort of thing, throw a type error". It would get tedious and people never do this, but it's worth mentioning. Everyone has a "javascript can do this weird wacky thing because it's dynamic, you can't write it this way in rust!" story and while nobody would want to make explicit what `V8` is doing on behalf of the programmer for that wacky trick, they certainly could if pushed to it.
+- When people prefer dynamic type systems, they claim to do so mostly for ergonomic reasons
+- When people prefer static type systems, they claim to do so mostly for correctness reasons
+- When people prefer to work without a type system, they're detailed oriented, highly motivated mavericks :P
 
-In many ways Type's relationship to code is hinted to most clearly in assembly. Python has built up an entire system by which it wraps every value with runtime type information and then incessantly checks them every step along the way. Assembly is so hard exactly because you need to always remember which registers hold what sorts of values and whether those values can currently be used with any given operations. There's often no stack trace when you're wrong, just baffling output. It's python, plus anytime you want to debug anything you immediately get a headache. As a developer, you must create robust understanding of the code where 99% of that work amounts to understanding what the `32bits` behind that `a` are meant to denote at this moment in time. Assembly programmers must be VERY good a type-level reasoning exactly because they have no external support in that endeavour.
-
-Most everyone seems to have agreed that explicit types are better, but there's a schism between people who think type checking should be dynamic vs those who think it should be static. 
-
- **BUT!** they're the sauce that makes programming work. Or... something like that. Lend me your ~~ear~~ eyes, this is an attempt to write out my understanding of the topic and should be taken as such. I am not an expert on types and am likely to provide an incomplete or perhaps even entirely wrong understanding of some of these concepts. 
-
-The plan is to update this as my understanding evolves.
-
-----
-
-<sup>[1]</sup> Any data ~~structure~~ capable of encoding the structure of a program
+There's another element to this that is generally overlooked. I think any time spent learning type theory gets paid back an order of magnitude later. To that end, I find languages with expressive static type systems that bring type-level reasoning into the surface syntax and feature type-checking are great didactic languages. Perhaps **PureScript** isn't the best first language to learn, but learning multiple programming languages is exceedingly likly to make you a better developer. Languages with advanced static type systems are especially enlightening in this regard.
 
 # What is a Type?
 
@@ -106,7 +110,18 @@ let a: i32 = 5;
 
 `int` and `i32` are types and in this case and both denote a {% emph() %}32-bit signed two's complement integer{% end %}. The variable `a` is exactly one of `int`'s 2<sup>32</sup> (or 4294967296) possible inhabitants. There's some loose notion under which `a` denotes an element of `int` as though `int` were a set. If I had written `int a = 5.0,` I would have received a compilation error saying the expression is not well typed. The error would say something to the effect that a floating point number cannot be assigned to a variable meant to hold an integer.
 
-At their core, types seem like a very simple, but frustratingly abstract thing. They have a somewhat liminal nature, existing in many forms directly in syntax — where rules inductively define well typed syntax — and also in the meta-language — where we leave it as an exercise to the reader to understand why some expressible syntax is not necessarily meaningful. 
+At their core, types seem like a very simple, but frustratingly abstract thing. They have a somewhat liminal nature, existing in many forms directly in syntax — where rules inductively define well typed syntax — and also in the meta-language — where we leave it as an exercise to the reader to understand why some expressible syntax is not necessarily meaningful.
+
+Types can be nominal. Where some value must be given to you with it's type
+
+```
+0010: Integer // Since this value is an element of Integer, we can interpret this as the number 2
+0010: Color // Since this value is an element of Color, we can interpret this as the number 2
+```
+
+```Haskell
+data Directions = Left | Up | Right | Down
+```
 
 That's rather vague; in programming languages types seem to be restrictions<sup>[1]</sup> on the symbolic construction of a program. For example, this can be seen as restrictions on which values can be assigned to a variable, passed to a function, appended to a list, and so on. I dunno, consider the following program
 
@@ -459,3 +474,17 @@ It seems to me that this is the state of affairs regardless of type system sound
   2. The lack of safety of an impoverished type system.
 
 Considering that a type system takes time both to learn and to use, it's unlikely massive software systems will get written in languages like Agda. The burden to hire developers and the extra effort required to use the type system may create an insurmountable problem for now. However, there's some hope, languages (like Haskell, Rust, etc) are experiments in what can be done to keep the type system expressive, sound, as well as productive.
+
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+
+# The Dynamic Static Type Split
+
+Types are a little bit "pay as you go" in that you can can generally define a python-style {%emph()%}"This Type Can Be Any Number of things"{%end%} type in a type system and then basically program as though you're in a dynamic language. This means they could in theory work as a "use them only where they're helpful" language feature. I say that, but the ergonomics would be horendous. You would be required to do all the fun bookkeeping python does for you, like every time you try to use a value add a possible error "If this isn't the right sort of thing, throw a type error". It would get tedious and people never do this, but it's worth mentioning. Everyone has a "javascript can do this weird wacky thing because it's dynamic, you can't write it this way in rust!" story and while nobody would want to make explicit what `V8` is doing on behalf of the programmer for that wacky trick, they certainly could if pushed to it.
+
+In many ways Type's relationship to code is hinted to most clearly in assembly. Python has built up an entire system by which it wraps every value with runtime type information and then incessantly checks them every step along the way. Assembly is so hard exactly because you need to always remember which registers hold what sorts of values and whether those values can currently be used with any given operations. There's often no stack trace when you're wrong, just baffling output. It's python, plus anytime you want to debug anything you immediately get a headache. As a developer, you must create robust understanding of the code where 99% of that work amounts to understanding what the `32bits` behind that `a` are meant to denote at this moment in time. Assembly programmers must be VERY good a type-level reasoning exactly because they have no external support in that endeavour.
+
+Most everyone seems to have agreed that explicit types are better, but there's a schism between people who think type checking should be dynamic vs those who think it should be static. 
+
+ **BUT!** they're the sauce that makes programming work. Or... something like that. 
