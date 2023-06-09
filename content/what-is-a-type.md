@@ -12,7 +12,9 @@ toc = true
 keywords = "Types, Syntax, Semantics, Logic, Math, Foundation, Type Theory, Programming, Language"
 +++
 
-This is the first in a series of posts exploring Types, Type Theory, Type Systems, and some related content from the point of view of a computer scientist. The general idea is to provide a {%emph()%}10000 foot view{%end%} of what I've been learning on the topic that may inspire me (or others) to remember and learn more. This article takes a while to feel like it's about computer science, but it is! Really!
+This is the first in a series of posts exploring Types, Type Theory, Type Systems, and some related content from the point of view of a computer scientist. The general idea is to provide a {%emph()%}10000 foot view{%end%} of what I've been learning on the topic that may inspire me (or others) to remember and learn more. 
+
+This article takes a while to feel like it's about computer science, but it is! Really!
 
 # What are Propositions in Propositional Logic?
 
