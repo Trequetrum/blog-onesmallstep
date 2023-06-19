@@ -20,11 +20,11 @@ This article takes a while to feel like it's about computer science, but it is! 
 
 While tackling this topic, I'm hoping that you have some (perhaps partially forgotten) introductory-level knowledge of formal logic. I first learned some propositional logic in my Grade 11 Discrete Mathematics course, then again in undergraduate philosophy. I'm not going to lean on it in any in-depth way in this blog, but its a nice building block for understanding type systems and in turn, types.
 
-While I don't want to turn this is an introduction to propositional logic, lets take a quick moment to refresh our memories on the two ways you can prove that `A ∧ B` implies `B ∧ A` in propositional logic.
+While I don't want to turn this is an introduction to propositional logic, lets take a quick moment to refresh our memories on the two ways you can prove that `A ∧ B` entails `B ∧ A` in propositional logic.
 
 ### The Semantic Proof
 
-The first way you can prove that that `A ∧ B` implies `B ∧ A` in propositional logic is via a semantic proof. You've probably seen these done via tables (often called "truth tables") like so:
+The first way you can prove that that `A ∧ B` entails `B ∧ A` in propositional logic is via a semantic proof. You've probably seen these done via tables (often called "truth tables") like so:
 
 <table style="width: auto">
   <tr>
@@ -71,7 +71,7 @@ So it turns out that in propositional logic, you can always discover whether `A 
 
 ### Proofs using a Proof System
 
-The second way you can prove that that `A ∧ B` implies `B ∧ A` in propositional logic is via its proof system. 
+The second way you can prove that that `A ∧ B` entails `B ∧ A` in propositional logic is via its proof system. 
 
 I'm not going to go over proof rules. I'm assuming that even if you've forgotten the specifics, you remember generally how they were used. Instead, I'll ask you to notice that we don't contend with `T` or `F` at all while using a proof system. This is because the end-game of a proof system is to cleverly pick rules that only let you assume something to denote `T` **or** to write something that must denote `T`. If you do this, you can magically know what your truth table looks like for every line where your assumptions are `T` (without ever writing the table out).
 
@@ -103,10 +103,6 @@ I'm not going to go over proof rules. I'm assuming that even if you've forgotten
 </table>
 
 We say that `A ∧ B ⊢ B ∧ A` because we have a proof system where if we assume `A ∧ B`, there exists some number of legal lines after which we can legally write `B ∧ A`. This is a purely syntactic game. This becomes an interesting game to us because we've designed it so that it can only generate propositions for which `⊨` also holds. We have a term for this relationship. Having this property where `A ⊢ B` implies `A ⊨ B` makes a proof system {%emph()%}sound{%end%}. (Perhaps less interestingly; for propositional logic it is also the case that `A ⊨ B` implies `A ⊢ B`, which makes propositional logic {%emph()%}complete{%end%})
-
-{%aside()%}
-If `⊢` is syntactic implication, and `⊨` is semantic implication what sort of implication is "`A ⊢ B` implies `A ⊨ B`"? It probably implies that this isn't the most formal way to present these ideas. When I write implies without a symbol, I'm asking you to lean on your english understanding of the term to make sense of the concept. Fingers crossed I haven't lost you yet.
-{%end%}
 
 ### Propositional Proofs in General
 
