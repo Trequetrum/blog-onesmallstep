@@ -487,4 +487,4 @@ In many ways Type's relationship to code is hinted to most clearly in assembly. 
 
 Most everyone seems to have agreed that explicit types are better, but there's a schism between people who think type checking should be dynamic vs those who think it should be static. 
 
- **BUT!** they're the sauce that makes programming work. Or... something like that. 
+**BUT!** they're the sauce that makes programming work. Or... something like that.
