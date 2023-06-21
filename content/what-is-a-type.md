@@ -14,17 +14,35 @@ keywords = "Types, Syntax, Semantics, Logic, Math, Foundation, Type Theory, Prog
 
 This is the first in a series of loosely related posts exploring Types, Type Theory, Type Systems, and some related content from the point of view of a computer scientist. The general idea is to provide a {%emph()%}10000 foot view{%end%} of what I've been learning on the topic that may inspire me (or others) to remember and learn more. 
 
-This article takes a while to feel like it's about computer science, but it is! Really!
+# Preface
+
+The question this blog post is trying to answer can feel rather nebulous. The problem is that in programming languages, types wear many hats. Function overloading lets you create control flow based on types, deriving mechanisms let you generate code based on types, and so forth. Statically dispatched function overloading isn't really about types, it's about saving developers the trouble of coming up with and keeping track of more names for functions. Deriving mechanisms save keystrokes, which is awesome, but types aren't about keystrokes.
+
+My plan here is to dance around the topic a bit. I want to talk about the basic types most programmers are familiar with — for example, integers. I also want to motivate future discussions in other posts about types that are a bit more abstract. For example, types that construct other types, or types that form a mathematical structure called a semiring — which among other things let you use algebra to get nice things for free.
+
+One of the things I've hoped to avoid is to mystify types (I'm not sure whether I've succeeded). While types seem to get at the fundamentals of what abstraction is about, they're also very natural. Assembly programmers have been using types since before we developed syntax for them or automated ways to enforce/check them. What I'm trying to dance around here really shouldn't invalidate anything about the types you are already familiar with. Nobody has lied to you about {%emph(c="blue")%}Booleans{%end%} or {%emph(c="blue")%}Strings{%end%}, they continue to be what you've always known. 
+
+{%aside()%}
+Once you've studied types for a bit, things that seemed completely unrelated before can start to look like pretty much the same thing. Hidden inside a signed integer (or any sum type), is the essential structure of "making a choice", which is what an `if` statement is about as well.
+
+If you look at a jump statement (which abstract into **If** statments, **Loops**, and such) as a mathematical object, you end up with something that looks like it has the same structure as a **choice type**, or an **exlusive OR**, or even (perhaps surprisingly) an **addition**. 
+
+When you have instructions that don't depend on one another, you end up with something that looks like it has the same structure as **pair types**, or **logical AND**, or even **multiplication**.
+
+This probably all seems like abstract nonsense, and it is :P. But; it's cool.
+{%end%}
+
+We're not going to get into any anything like looking at any specific types here. Instead, I'm going to detour us into some super basic Propositional Logic and hopefully come full circle into a very vague understanding of types and how we might change our view on what it means to annotate a program with them.
 
 # Type Systems share some Similarities with Proof Systems
 
-While tackling this topic, I'm hoping that you have some (perhaps partially forgotten) introductory-level knowledge of formal logic. I first learned some propositional logic in my Grade 11 Discrete Mathematics course, then again in undergraduate philosophy. I'm not going to lean on it in any in-depth way in this blog, but its a nice building block for understanding type systems and in turn, types.
+While tackling this topic, I'm hoping that you have some (perhaps partially forgotten) introductory-level knowledge of formal logic. If you’re like me, you may have encountered some propositional logic in your Grade 11 Discrete Mathematics course, or perhaps a few years later in undergraduate philosophy. I'm not going to lean on it in any in-depth way in this blog, but its a nice building block for understanding type systems and in turn, types.
 
-While I don't want to turn this is an introduction to propositional logic, lets take a quick moment to refresh our memories on the two ways you can prove that `A ∧ B` entails `B ∧ A` in propositional logic.
+While I don't want to turn this is an introduction to propositional logic, lets take a quick moment to refresh our memories on the two ways you can show that `A ∧ B` entails `B ∧ A` in propositional logic.
 
 ### The Semantic Proof
 
-The first way you can prove that that `A ∧ B` entails `B ∧ A` in propositional logic is via a semantic proof. You've probably seen these done via tables (often called "truth tables") like so:
+The first way you can show that `A ∧ B` entails `B ∧ A` in propositional logic is via a semantic proof. You've probably seen these done via tables (often called "truth tables") like so:
 
 <table style="width: auto">
   <tr>
@@ -61,19 +79,23 @@ The first way you can prove that that `A ∧ B` entails `B ∧ A` in proposition
 
 Implicit in this table is the meaning of `A` and the meaning of `B`. To make this explicit, they denote something called a proposition. Semantically, propositions are these objects that can be either `T` or `F` (Sometimes read as *"true"* and *"false"* respectively). `T` and `F` don't appear anywhere when we discuss the syntax of propositional logic, they only appear when we ask something like "what does `A` mean?"
 
-We say that `A ∧ B ⊨ B ∧ A` because when we ask what `A ∧ B`, and `B ∧ A` means, any time `A ∧ B` is `T`, so is `B ∧ A` (More generally, we can understand `⊨` here as a relationship between specific rows and columns on a truth table). This is pretty easy in this case because we can exhaustively look at every possibility: All four of them!.
+We say that `A ∧ B ⊨ B ∧ A` because when we ask what `A ∧ B`, and `B ∧ A` means, in every instance where `A ∧ B` is `T`, `B ∧ A` is also `T` (More generally, we can understand `⊨` here as a relationship between specific rows and columns on a truth table). This is pretty easy in this case because we can exhaustively look at every possibility: All four of them!
 
 {%aside()%}
-Maybe you think the answer to a question like "what does `A` mean?" should be something like "A stands for 'grass is green'". In philosophy, it's common to pick linguistic propositions that we know the truth of instead of picking `T` or `F` directly. Really, what you're doing is picking a line from the table above. Or as another example, lets say `A` stands for *"I will never win the lottery"* and `B` stands for *"pigs can fly"*, you can think of picking a linguistic proposition that we don't know the truth of as either nonsense or as a way to look at two lines in the table above. This case is semantically interesting because `A ∧ B` is `F` regardless of how we interpret `A`. This habit of matching propositional symbols with linguistic phrases is only done for historical reasons or to motivate learning. The underlying semantics is about `T` and `F` regardless of the linguistics you use as a stand-in.
+Maybe you think the answer to a question like "what does `A` mean?" should be something like "A stands for 'grass is green'". In philosophy, it's common to pick linguistic propositions that we know the truth of instead of picking `T` or `F` directly. Really, what you're doing is picking a line from the table above. 
+
+I suppose you may pick a proposition you don’t know the truth of. Lets say `A` stands for *"I will never win the lottery"* and `B` stands for *"pigs can fly"*; you can think of picking a linguistic proposition that we don't know the truth of as either nonsense or as a way to look at two lines in the table above. This case is semantically interesting because we know the truth of `B`, we can see that `A ∧ B` is `F` regardless of how we interpret `A`. 
+
+This habit of matching propositional symbols with linguistic phrases is only done for historical reasons or to motivate learning. The underlying semantics is about `T` and `F` regardless of the linguistics you use as a stand-in. We'll look at what sort of objects propositions are a bit more below.
 {%end%}
 
-So it turns out that in propositional logic, you can always discover whether `A ⊨ B` by building a truth table. So we don't need a proof system, though a proof system is still nice as once your propositions get more complicated, the rows of these truth tables grow exponentially.
+So it turns out that in propositional logic specifically, you can always discover whether `A ⊨ B` by building a truth table. Building these tables quickly gets tiresome and other logics don’t can’t be exhaustively searched this way, so there’s another way to show this entailment. 
 
-### Proofs using a Proof System
+### Entailment using a Proof System
 
 The second way you can prove that that `A ∧ B` entails `B ∧ A` in propositional logic is via its proof system. 
 
-I'm not going to go over proof rules. I'm assuming that even if you've forgotten the specifics, you remember generally how they were used. Instead, I'll ask you to notice that we don't contend with `T` or `F` at all while using a proof system. This is because the end-game of a proof system is to cleverly pick rules that only let you assume something to denote `T` **or** to write something that must denote `T`. If you do this, you can magically know what your truth table looks like for every line where your assumptions are `T` (without ever writing the table out).
+I'm not going to go over proof rules. I'm assuming that even if you've forgotten the specifics, you remember generally how they were used. Instead, I'll ask you to notice that we don't contend with `T` or `F` at all while using a proof system. This is because the end-game of a proof system is to cleverly pick rules that only let you assume something to denote `T` **or** to write something that must denote `T`. If you somehow convincingly manage the feat of picking your rules this way, you can magically know what your truth table looks like for every relevant line.
 
 <table style="width: auto">
   <tr>
@@ -102,13 +124,11 @@ I'm not going to go over proof rules. I'm assuming that even if you've forgotten
   </tr>
 </table>
 
-We say that `A ∧ B ⊢ B ∧ A` because we have a proof system where if we assume `A ∧ B`, there exists some number of legal lines after which we can legally write `B ∧ A`. This is a purely syntactic game. This becomes an interesting game to us because we've designed it so that it can only generate propositions for which `⊨` also holds. We have a term for this relationship. Having this property where `A ⊢ B` implies `A ⊨ B` makes a proof system {%emph()%}sound{%end%}. (Perhaps less interestingly; for propositional logic it is also the case that `A ⊨ B` implies `A ⊢ B`, which makes propositional logic {%emph()%}complete{%end%})
+We say that `A ∧ B ⊢ B ∧ A` because we have a proof system where if we assume `A ∧ B`, there exists some number of legal lines after which we can legally write `B ∧ A`. We can understand `⊢` as a purely syntactic game because we never need to reference `T`, or `F`, or tables or any such thing. This becomes an interesting game to us because we've designed it so that it can only generate propositions for which `⊨` also holds. We have a term for this relationship. Having this property where `A ⊢ B` implies `A ⊨ B` makes a proof system {%emph()%}sound{%end%}. (Perhaps less interestingly; for propositional logic it is also the case that `A ⊨ B` implies `A ⊢ B`, which makes propositional logic’s proof system {%emph()%}complete{%end%}). 
 
 ### Propositional Proofs in General
 
-In propositional logic, the proof system approach is often a much more concise way to prove a proposition. For example, `A ∧ B ∧ C ∧ D ∧ E ⊨ B ∧ C ∧ D ∧ E ∧ A` takes a 32-line truth table, while `A ∧ B ∧ C ∧ D ∧ E ⊢ B ∧ C ∧ D ∧ E ∧ A` takes a 4-line proof (It’s a twin to the 4-line proof from above where `B ∧ C ∧ D ∧ E` replaces `B`).
-
-Consider also that there are logics (like predicate logic) where if you tried to create a truth table, you would be required to write an infinite number of lines. The real power of a proof system makes itself known under such circumstances.
+In propositional logic, the proof system approach is often a much more concise way to show an entailment. For example, `A ∧ B ∧ C ∧ D ∧ E ⊨ B ∧ C ∧ D ∧ E ∧ A` takes a 32-line truth table, while `A ∧ B ∧ C ∧ D ∧ E ⊢ B ∧ C ∧ D ∧ E ∧ A` takes a 4-line proof (It’s a twin to the 4-line proof from above where `B ∧ C ∧ D ∧ E` replaces `B`).
 
 The other cool property of a proof system is that as long as we agree to the same rules, anybody can check a proof and confirm that the rules have been followed. The idea that "there's no special intuition required, anybody can mechanistically check the rules" is what ends up making proofs written in a proof system machine checkable. You can write a program that can check the correctness of any proof.
 
@@ -118,7 +138,7 @@ So even in logics where you cannot "write out the truth table," and for which th
 
 So what does all this propositional logic have to do with Type Systems and with Types? 
 
-Well, type systems and proof systems have a lot of similar properties. They both have a clean separation of syntax and semantics, they both offer a purely syntactic set of rules, that anybody (even a program) can check. They both value the relationship between `⊢` and `⊨` so that the rules for what you can do syntactically translate well into the semantics. (Few programming languages actually boast a completely sound type system, though they do still value making the distinction as clear as possible)
+Well, type systems and proof systems have a lot of similar properties. They both have a clean separation of syntax and semantics, they both offer a purely syntactic set of rules, that anybody (even a program) can check. They both value the relationship between `⊢` and `⊨` so that the rules for what you can do syntactically translate well into the semantics (Few programming languages actually boast a properly sound type system, though they do still value making the distinction as clear as possible).
 
 Where the proof system above is just there to enforce tautologies, type systems exist to enforce abstractions. Specifically to do so in a machine tractable way. What does that even mean? Well, first lets get back to propositions so we can talk about about Types themselves.
 
@@ -143,9 +163,9 @@ whereas the following are not:
 
 This definition leans on a lot of other definitions and intuitions that don't actually surface in propositional logic at all. For starters, you'd be excused for thinking propositions are linguistic expressions, but philosophically the English sentence "Snow is white" denotes the same proposition as the German sentence "Schnee ist weiß" even though the two sentences are not the same. A more nuanced definition may say something about propositions being "the sort of thing that declarative sentences denote".
 
-This is all rather abstract and you can write a PhD Thesis on how linguistic expressions do/have embedded and deviate from formal logic. That sends us down the wrong rabbit whole. Really, propositions in propositional logic are the building blocks of a sort of syntactic game that gets interesting and applicable once you imbue it with meaning.
+This is all rather abstract and you can write a PhD Thesis on how linguistic expressions do/have embedded and deviate from formal logic. That sends us down the wrong rabbit whole for our purposes. Really, propositions in propositional logic are the building blocks of a sort of syntactic game that gets interesting and applicable once you imbue it with meaning.
 
-Syntactically, there are a set of base propositions. For example the elements of `{P, Q, R}` are propositions because we've defined them to be. Then there are a small set of logical connectives and rules for how they're to be used to juxtapose propositions. So the elements of `{¬, ∧, ∨, →, ↔}` are logical connectives. I won't spell out the rules for how to determine a well-formed formula. For example: `P → Q`, `P → ¬Q`, and `P ∨ ¬P` are all well formed but `P Q ∧`, `P ∧ ∧ Q`, and `¬∧P` are all not well formed. Then we perform the neat trick of saying that any well formed formula is a proposition because we define it to be.
+Syntactically, there are a set of base propositions. For example the elements of `{P, Q, R}` are propositions because we've defined them to be. Then there are a small set of logical connectives and rules for how they're to be used to juxtapose propositions. So the elements of `{¬, ∧, ∨, →, ↔}` are logical connectives. I won't spell out the rules for how to determine a well-formed formula. For example: `P → Q`, `P → ¬Q`, and `P ∨ ¬P` are all well formed but `P Q ∧`, `P ∧ ∧ Q`, and `¬∧P` are all not well formed. Then we perform the neat trick of saying that any well formed formula is definitionally a proposition.
 
 So assuming you learned the rules for a well-formed formula and you're armed with a set potentially infinite base propositions, you can simply say that propositional logic propositions are exactly these things. In a sense you can stop here. There are infinitely many of them, but you can create and verify every possible proposition and that's the end of it. You've answered the question: "What are Propositions in Propositional Logic?" as best as it can be answered.
 
@@ -158,11 +178,11 @@ So instead, let me quote Wikipedia:
 
 Such functions deterministically tell us how to interpret any proposition as {%emph()%}T{%end%} or {%emph()%}F{%end%} and imbue the entire enterprise with a structured meaning that is interesting. 
 
-As a cool aside, if you view {%emph()%}T{%end%} as the singleton set and {%emph()%}F{%end%} as the empty set, you can see the set theoretic semantics of propositional logic as a generalization of this semantic interpretation of predicate logic. So you can define the functions above using truth tables (the way I did earlier) or set operations like unions, intersections and such. The approaches are the same (up to isomorphism).
+As a cool aside, if you view {%emph()%}T{%end%} as the singleton set and {%emph()%}F{%end%} as the empty set, you can see the standard set theoretic semantics of propositional logic as a generalization of this semantic interpretation of predicate logic. So you can define the functions above using truth tables (in the style I used earlier) or you can define them as set operations like unions, intersections and such. The approaches are the same (up to isomorphism).
 
 # About Types
 
-Types are a syntactic tool for abstraction that don't have meaning other than to add structure to the question of whether some piece of syntax is well formed.
+Types are a syntactic tool for abstraction and can be talked about purely as a way to add structure to the question of whether some piece of syntax is well formed.
 
 Typically a type theory will have a few base types and then a few type-forming rules. Then types are straightforwardly defined as the (potentially infinite) hierarchy of types that can be generated. This is defining types by just looking at the syntactic game that creates them — seem familiar?.
 
@@ -185,11 +205,11 @@ or a Rust file and see:
 let a: i32 = 5;
 ```
 
-{%emph(c="blue")%}int{%end%} and {%emph(c="blue")%}i32{%end%} are types and in this case and both denote a {% emph(c="blue") %}32-bit signed two's complement integer{% end %}. The variable `a` is restricted in scope to exactly one of {%emph(c="blue")%}int{%end%}'s 2<sup>32</sup> (or 4294967296) possible inhabitants. There's some loose notion under which `a` denotes an element of {%emph(c="blue")%}int{%end%} as though {%emph(c="blue")%}int{%end%} were a set. If I had written `int a = 5.3,` I would have received a compilation error saying the expression is not well typed. The error would say something to the effect that the solver in the type checker failed to discover a way to unify the expression. In other words, there's no meaningful way to assign a floating point number to a variable meant to hold an integer.
+{%emph(c="blue")%}int{%end%} and {%emph(c="blue")%}i32{%end%} are types and in this case and both denote a {% emph(c="blue") %}32-bit signed two's complement integer{% end %}. The variable `a` is restricted in scope to exactly one of {%emph(c="blue")%}int{%end%}'s 2<sup>32</sup> (or 4294967296) possible inhabitants. There's some loose notion under which `a` denotes an element of {%emph(c="blue")%}int{%end%} as though {%emph(c="blue")%}int{%end%} is a set. If I had written `int a = 5.3,` I would have received a compilation error saying the expression is not well typed. The error would say something to the effect there's no meaningful way to assign a floating point number to a variable meant to hold an integer.
 
 Type systems and type theories use types as a syntactic tool for abstraction, but they don't need to be so embedded to be useful. Consider Hungarian notation, which is an identifier naming convention that prefaces variable names with their data type. For example, the {%emph()%}b{%end%} prefacing {%emph()%}bBusy{%end%} denotes a {%emph(c="blue")%}boolean{%end%} and {%emph()%}nSize{%end%} is an {%emph(c="blue")%}integer{%end%}. This was popularized in a language called BCPL because BCPL has no data types other than the machine word, nothing in the language itself helps a programmer remember variables' types. 
 
-Other untyped languages hold such information in the comments or through other conventions. It's important to note that just like assembly or BCPL still have types in the margins, typed languages also continue that trend. Developers can and do use the type {%emph(c="blue")%}integer{%end%} as a bit-field or the type {%emph(c="blue")%}string{%end%} as tags to approximate a disjoint union.
+Other untyped languages hold such information in the comments or through other conventions. It's important to note that just like assembly or BCPL still have types in the margins, typed languages also continue that trend. Developers can and do use the type {%emph(c="blue")%}integer{%end%} as a bit-field or the type {%emph(c="blue")%}string{%end%} as tags to approximate a disjoint union. Just consider that you can write a Haskell program that only uses values of type {%emph(c="blue")%}SequenceOfBits{%end%} (allowing a wrapper around the std library) to create most any program you'd like, though I imagine you'd have a hard time doing so without making many many many mistakes along the way.
 
 At their core, types seem like a very simple, but frustratingly abstract thing. They have a somewhat liminal nature, existing in many forms directly in syntax — where rules inductively define well typed syntax — and also in the meta-language — where we leave it as an exercise to the reader to understand why some expressible syntax is not necessarily meaningful.
 
