@@ -1,0 +1,4 @@
+Sitemap: https://trequetrum.github.io/blog-onesmallstep/sitemap.xml
+User-Agent: *
+Allow: /
+Host: https://trequetrum.github.io/blog-onesmallstep

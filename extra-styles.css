@@ -1,0 +1,1 @@
+:root:not(.light){--pink: #ec9ec0}:root.light{--pink: #ff0080}span.pink-emph{color:var(--pink)}span.blue-emph{color:#007492}div.aside{background-color:var(--c2);margin-left:40px;padding:5px;border-style:outset;border-width:3px}ul,ol{padding-left:2.5rem}li{margin-bottom:0}blockquote{background-color:var(--c2);padding:.5rem .5rem .5rem 1.5rem}

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>One Small Step - Lua</title>
+    <subtitle>Now let it work. Mischief, thou art afoot, Take thou what course thou wilt!</subtitle>
+    <link href="https://trequetrum.github.io/blog-onesmallstep/tags/lua/atom.xml" rel="self" type="application/atom+xml"/>
+    <link href="https://trequetrum.github.io/blog-onesmallstep"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2023-04-21T00:00:00+00:00</updated>
+    <id>https://trequetrum.github.io/blog-onesmallstep/tags/lua/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Writing a Hanabi Mod for Tabletop Simulator</title>
+        <published>2023-04-21T00:00:00+00:00</published>
+        <updated>2023-04-21T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://trequetrum.github.io/blog-onesmallstep/tts-hanabi/" type="text/html"/>
+        <id>https://trequetrum.github.io/blog-onesmallstep/tts-hanabi/</id>
+        
+        <content type="html">&lt;h1 id=&quot;preface&quot;&gt;Preface&lt;&#x2F;h1&gt;
+&lt;p&gt;Roughly a year ago, I wrote a scripted Hanabi Mod for Tabletop Simulation. Here is &lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;steamcommunity.com&#x2F;sharedfiles&#x2F;filedetails&#x2F;?id=2793392461&quot;&gt;the link&lt;&#x2F;a&gt;. This is a bit of a retrospective on that experience. I talk about Lua, Tabletop&#x27;s Scripting API, and a bit about my journey programming with them.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;first-some-thoughts-about-lua&quot;&gt;First, Some Thoughts About Lua&lt;&#x2F;h1&gt;
+&lt;p&gt;Lua is a fast, light-weight, embeddable scripting language. It was designed for configuration and small automation scripts, though you really can&#x27;t ignore that it&#x27;s been one of &lt;strong&gt;the&lt;&#x2F;strong&gt; de-facto scripting language for games for decades now. Titans like World of Warcraft, Minecraft, &amp;amp; Roblox all use Lua as their scripting language to develop mods.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;lua-is-small&quot;&gt;Lua is Small&lt;&#x2F;h2&gt;
+&lt;span class=pink-emph&gt;Both physically:&lt;&#x2F;span&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The source contains around 30000 lines of C. Under 64-bit Linux, the Lua interpreter built with all standard Lua libraries takes 281K and the Lua library takes 468K. &lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Lua: About &lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;www.lua.org&#x2F;about.html&quot;&gt;(link)&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;&lt;span class=pink-emph&gt;And conceptually:&lt;&#x2F;span&gt; I felt like I had a grasp of both the language and it&#x27;s standard library in an afternoon. Of course, as such things go, sometimes it feels like there&#x27;s always a little more to learn. Lua does still have all the depth, nuance, and eccentricities of a general purpose programming language.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;lua-is-simple&quot;&gt;Lua is Simple&lt;&#x2F;h2&gt;
+&lt;p&gt;It offers relatively few abstractions and those that it does offer must be used explicitly.&lt;&#x2F;p&gt;
+&lt;p&gt;As an example, consider JavaScript wherein you have named functions, anonymous functions, and arrow functions as well as important details about what a function&#x27;s context&#x2F;receiver is (What gets bound to the &lt;code&gt;this&lt;&#x2F;code&gt; keyword) depending on which type of function you&#x27;re dealing with.&lt;&#x2F;p&gt;
+&lt;p&gt;In Lua, you have only anonymous functions full stop. (though you can get back a method-style syntax with the colon operator &lt;code&gt;:&lt;&#x2F;code&gt;).&lt;&#x2F;p&gt;
+&lt;p&gt;As is standard for dynamically typed languages, Lua offers a small set of types and no means to define your own. Lua has — for the most part — leaned into this simplicity and avoided building any complex object&#x2F;class&#x2F;type hierarchies (though the option is there via matatables and metamethods). &lt;&#x2F;p&gt;
+&lt;p&gt;Consider Lua&#x27;s array-hashmap mashup type — &lt;span class=blue-emph&gt;tables&lt;&#x2F;span&gt;:&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Tables are the main (in fact, the only) data structuring mechanism in Lua, and a powerful one. We use tables to represent ordinary arrays, symbol tables, sets, records, queues, and other data structures, in a simple, uniform, and efficient way. Lua uses tables to represent packages as well.&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.lua.org&#x2F;pil&#x2F;contents.html&quot;&gt;Programming in Lua (link)&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;h2 id=&quot;lua-is-mature&quot;&gt;Lua is Mature&lt;&#x2F;h2&gt;
+&lt;p&gt;Because Lua been around since 1993, the community and resources for the language are fairly large. To me, its friendly and enthusiastic community is a &lt;strong&gt;major&lt;&#x2F;strong&gt; selling point for the language. &lt;&#x2F;p&gt;
+&lt;p&gt;Lua isn&#x27;t without its pain-points. Default global scoping, strange table length semantics, no unicode support, limited pattern matching support, and unfortunate return statement semantics are just some of the baggage Lua carries today.&lt;&#x2F;p&gt;
+&lt;p&gt;That being said, considering its design goals, speed, simplicity, and the ease with which it can be embedded as a scripting&#x2F;plugin language, Lua has done just about everything right. I have enjoyed the simplicity and consistency of the language.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;programming-for-tabletop-simulator&quot;&gt;Programming for Tabletop Simulator&lt;&#x2F;h1&gt;
+&lt;p&gt;One way to think about Tabletop Simulator (TTS) is as a light-weight game engine, allowing you to build scenes filled with 3D assets and interact with them. Most of the game development primitives are present, though they&#x27;re typically incredibly simplified and geared toward the physics&#x2F;tabletop experience. &lt;&#x2F;p&gt;
+&lt;p&gt;It&#x27;s fun. The immediate feedback is welcome and enjoyable when things are working. You don&#x27;t need to understand any of the finer details of game development to get started. If you want to run a few little scripts here and there, react to certain inputs in simple ways, then the process of doing so with TTS is simple. &lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;However&lt;&#x2F;strong&gt;, if you want to build anything reasonably complex, you can do so but TTS either doesn&#x27;t doesn&#x27;t offer much help or even gets in your way. Without the active, friendly discord community around modding TTS, I would not have bothered to finish the Hanabi Mod. There are a lot of interactions at play for which the documentation is generally silent: &lt;strong&gt;&amp;quot;If you know, you know, otherwise good luck.&amp;quot;&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Here are a few examples that I remember perplexing me at the time: &lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;If I want to display a custom UI image floating perpendicularly (at a 90° angle) above a card, I need to multiply the z-axis by a bunch since the custom card object comes pre-compressed on that axis. This works but causes pixelation which you can correct for by stretching your image in Photoshop instead.&lt;&#x2F;li&gt;
+&lt;li&gt;Certain properties of an object are accessible only via their XML&#x2F;data table so you can&#x27;t take the recommended route of spawning a custom Object and then provide the custom content for it after spawning it by calling &lt;code&gt;setCustomObject()&lt;&#x2F;code&gt; (As an aside, be sure to wait for the physics engine to fully spawn the object before trying to update it). Instead you must prepare an object data table representation which you can derive from another object by calling &lt;code&gt;getData()&lt;&#x2F;code&gt; on it, and manipulating the resulting table.&lt;&#x2F;li&gt;
+&lt;li&gt;There are a thousand and one ways for &lt;em&gt;globally unique identifiers&lt;&#x2F;em&gt; — GUIDs — to become out of sync with your script&#x27;s expectations during development. So either be unerringly careful or create a less brittle mechanism by which to identify your game objects.
+&lt;ul&gt;
+&lt;li&gt;This is especially true if you try to do anything like automate updates&#x2F;settup&#x2F;testing for your mod while developing.&lt;&#x2F;li&gt;
+&lt;li&gt;I used a combination of naming conventions and asset filesystem locations. Then Git can track changes and the scripts are robust against asset updates so long as filenames stay consistent. Not a perfect solution, but a quick one.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;li&gt;The Table Object is subject to a whole host of unwritten rules, but if you just delete it and use some other custom asset as a stand-in for your table, that all becomes significantly easier to manage.
+&lt;ul&gt;
+&lt;li&gt;For example, getting the Table to display a custom image with the right proportions was so frustrating that I eventually put it on a board with the right size, removed interactivity, and floated the board just so to make it look like the table.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;and so on and so on... the list is long, though it becomes manageable as you keep writing and working with it. The best advice I can give here is to get on forums or discord and ask questions.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;my-experience-programming-hanabi&quot;&gt;My Experience Programming Hanabi&lt;&#x2F;h1&gt;
+&lt;p&gt;For me, creating a scripted Hanabi with Tabletop Simulator (TTS) + Lua was fun from a gaming perspective but a relatively joyless development experience. &lt;&#x2F;p&gt;
+&lt;p&gt;TTS doesn&#x27;t provide the sort of immediate feedback loop that a scripting language like Lua thrives with. There&#x27;s a tension between the &lt;em&gt;game-settup, table-building, drag &amp;amp; drop&lt;&#x2F;em&gt; nature of TTS and its scripting. Often this means that testing some interaction requires you to reload your scripts and then perform some in-game action — spawn, move, click, deal, ect. Tabletop comes with a lot of tools designed so that many typical board game systems are effectively &amp;quot;pre-scripted&amp;quot;. This is nice though as your begin creating custom scripts you find yourself needing to work around many of he quirks of these systems.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;missing-static-types&quot;&gt;Missing Static Types&lt;&#x2F;h2&gt;
+&lt;p&gt;This one is mostly a matter of preference.&lt;&#x2F;p&gt;
+&lt;p&gt;I&#x27;m accustomed to programming alongside a type checker. Programming well with a dynamic language requires a certain skill&#x2F;focus that I&#x27;m not well practised with. Without a type system to keep me in check, I&#x27;m capable of creating a mess rather quickly.&lt;&#x2F;p&gt;
+&lt;p&gt;My development style for this game was very exploratory. When I started, I wasn&#x27;t really sure what features I wanted and how they would fit together. At first this seems like a good fit for a dynamically typed language like Lua, but the result is that too much time ends up being spent hunting down refactoring bugs leaving less time to experiment with system interactions.&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;In a language like Haskell you can re-architect a system. If you&#x27;ve separated out your domain logic (which is where Haskell&#x27;s purity excels), by the time you&#x27;ve satisfied the compiler there&#x27;s a gloriously compelling chance everything works as expected the first time you run the refactored program.
+&lt;ul&gt;
+&lt;li&gt;If you&#x27;re not sure your idea for how to re-architect your system will even work, this is slow as the &amp;quot;test the happy path first, then worry about making it robust later&amp;quot; style of programming is more difficult. &lt;&#x2F;li&gt;
+&lt;li&gt;If you have a clear vision for how your update&#x2F;new feature will work, a little extra effort removes most of the technical debt associated with a new feature or refactor. &lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;li&gt;In a language like C# (another common game-dev plugin language), you&#x27;ll have to hunt down a few bugs as the type system so often doesn&#x27;t know the difference between a total and partial function. There&#x27;s also bound to be some edge cases around ordering of effects you hadn&#x27;t considered in your refactoring.
+&lt;ul&gt;
+&lt;li&gt;It&#x27;s easy enough to use dynamic variables to more or less ignore the type system when prototyping, though this creates a different kind of technical debt. Post-hoc typing can be difficult as types often encode cross-cutting concerns that may require you to reorganize code to keep your types cleaner&#x2F;manageable. &lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;li&gt;With Lua, you&#x27;re better off performing a re-write than trying to refactor for anything as intrusive as re-architecting your system. This can be abated with a good testing suit, but TTS makes writing such a thing extremely laborious if not outright untenable (This isn&#x27;t Lua&#x27;s fault, of course). Many of the bugs I caught while play-testing with friends where introduced because of a seemingly harmless refactoring rather than some ill-considered business logic.
+&lt;ul&gt;
+&lt;li&gt;Progress comes in leaps and bounds. The temptation to simply spaghetti-code your way across the finish line is pretty high.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;When I&#x27;m in programming mode, I&#x27;m somehow able to hold large chunks of a program in my mind. &lt;strong&gt;However&lt;&#x2F;strong&gt;, the moment I context switch away and come back some time later, I find it difficult to re-create the same mind-state. To combat this issue, I work to keep my game logic localized. To the best of my ability, I try to rely on the idea that any block of code which has no hidden dependency is a boon to the continued development or future maintenance of my software.&lt;&#x2F;p&gt;
+&lt;p&gt;When it makes sense, attaching scripts to physical in-game objects that can encapsulate and manage their own state is nice. To some degree, this is a simplified version of the standard Object Oriented game-dev design you encounter making games with Unity, Unreal, Godot, etc:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Hanabi&#x27;s score-display is a good example of an isolated system like this.&lt;&#x2F;li&gt;
+&lt;li&gt;In general, it seems like game systems don&#x27;t cleanly attach to in-game scene entities&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;The TTS event handlers allow for local reasoning as well. With events, you can view game interactions as messages between systems. If you keep messages themselves immutable, you can maintain a clean separation between systems. Unfortunately, event handlers are fairly limited. This is because the TTS scripting API treats almost everything — Players, Objects, and their properties — as global mutable state. Lua&#x27;s impoverished type system means it&#x27;s up to the developer to first understand and then forever remember all the interactions at play. The choices made by TTS are orthogonal to the design of Lua, but the fact remains that Lua doesn&#x27;t offer any tooling to correct course.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;lua-s-coroutines&quot;&gt;Lua&#x27;s Coroutines&lt;&#x2F;h2&gt;
+&lt;p&gt;Here&#x27;s the thing... In hindsight, I should have stuck with Lua&#x27;s coroutines. &lt;&#x2F;p&gt;
+&lt;p&gt;When I first toyed around with them, I didn&#x27;t like the pattern by which you convert TTS&#x27;s callback-style API into one that smoothly interoperated with Coroutines. By the time I&#x27;d seen that this could be done quite nicely, I&#x27;d already taken another route and was no longer interested in the size of a refactor that switching back would require.&lt;&#x2F;p&gt;
+&lt;p&gt;Here&#x27;s my solution. A function that flattens nested callbacks:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;Lua&quot; class=&quot;language-Lua z-code&quot;&gt;&lt;code class=&quot;language-Lua&quot; data-lang=&quot;Lua&quot;&gt;&lt;span class=&quot;z-source z-lua&quot;&gt;&lt;span class=&quot;z-meta z-function z-lua&quot;&gt;&lt;span class=&quot;z-meta z-block z-lua&quot;&gt;&lt;span class=&quot;z-storage z-type z-function z-lua&quot;&gt;function&lt;&#x2F;span&gt; &lt;span class=&quot;z-meta z-name z-function&quot;&gt;&lt;span class=&quot;z-entity z-name z-function z-lua&quot;&gt;bindCallback&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;span class=&quot;z-meta z-group z-lua&quot;&gt;&lt;span class=&quot;z-punctuation z-section z-group z-begin z-lua&quot;&gt;(&lt;&#x2F;span&gt;&lt;span class=&quot;z-variable z-parameter z-function z-lua&quot;&gt;callback_thunk&lt;&#x2F;span&gt;&lt;span class=&quot;z-punctuation z-separator z-comma z-lua&quot;&gt;,&lt;&#x2F;span&gt; &lt;span class=&quot;z-variable z-parameter z-function z-lua&quot;&gt;bind_fn&lt;&#x2F;span&gt;&lt;span class=&quot;z-punctuation z-section z-group z-end z-lua&quot;&gt;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+    &lt;span class=&quot;z-keyword z-control z-return z-lua&quot;&gt;return&lt;&#x2F;span&gt; &lt;span class=&quot;z-meta z-function z-lua&quot;&gt;&lt;span class=&quot;z-meta z-block z-lua&quot;&gt;&lt;span class=&quot;z-storage z-type z-function z-lua&quot;&gt;function&lt;&#x2F;span&gt;&lt;span class=&quot;z-meta z-group z-lua&quot;&gt;&lt;span class=&quot;z-punctuation z-section z-group z-begin z-lua&quot;&gt;(&lt;&#x2F;span&gt;&lt;span class=&quot;z-variable z-parameter z-function z-lua&quot;&gt;callback&lt;&#x2F;span&gt;&lt;span class=&quot;z-punctuation z-section z-group z-end z-lua&quot;&gt;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+        &lt;span class=&quot;z-variable z-function z-lua&quot;&gt;callback_thunk&lt;&#x2F;span&gt;&lt;span class=&quot;z-meta z-function-call z-arguments z-lua&quot;&gt;&lt;span class=&quot;z-meta z-group z-lua&quot;&gt;&lt;span class=&quot;z-punctuation z-section z-group z-begin z-lua&quot;&gt;(&lt;&#x2F;span&gt;&lt;span class=&quot;z-meta z-function z-lua&quot;&gt;&lt;span class=&quot;z-meta z-block z-lua&quot;&gt;&lt;span class=&quot;z-storage z-type z-function z-lua&quot;&gt;function&lt;&#x2F;span&gt;&lt;span class=&quot;z-meta z-group z-lua&quot;&gt;&lt;span class=&quot;z-punctuation z-section z-group z-begin z-lua&quot;&gt;(&lt;&#x2F;span&gt;&lt;span class=&quot;z-constant z-language z-lua&quot;&gt;...&lt;&#x2F;span&gt;&lt;span class=&quot;z-punctuation z-section z-group z-end z-lua&quot;&gt;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+            &lt;span class=&quot;z-storage z-modifier z-lua&quot;&gt;local&lt;&#x2F;span&gt; &lt;span class=&quot;z-variable z-other z-lua&quot;&gt;thunk&lt;&#x2F;span&gt; &lt;span class=&quot;z-keyword z-operator z-assignment z-lua&quot;&gt;=&lt;&#x2F;span&gt; &lt;span class=&quot;z-variable z-function z-lua&quot;&gt;bind_fn&lt;&#x2F;span&gt;&lt;span class=&quot;z-meta z-function-call z-arguments z-lua&quot;&gt;&lt;span class=&quot;z-meta z-group z-lua&quot;&gt;&lt;span class=&quot;z-punctuation z-section z-group z-begin z-lua&quot;&gt;(&lt;&#x2F;span&gt;&lt;span class=&quot;z-constant z-language z-lua&quot;&gt;...&lt;&#x2F;span&gt;&lt;span class=&quot;z-punctuation z-section z-group z-end z-lua&quot;&gt;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+            &lt;span class=&quot;z-keyword z-control z-conditional z-lua&quot;&gt;if&lt;&#x2F;span&gt; &lt;span class=&quot;z-variable z-other z-lua&quot;&gt;thunk&lt;&#x2F;span&gt; &lt;span class=&quot;z-keyword z-operator z-comparison z-lua&quot;&gt;~=&lt;&#x2F;span&gt; &lt;span class=&quot;z-constant z-language z-null z-lua&quot;&gt;nil&lt;&#x2F;span&gt; &lt;span class=&quot;z-keyword z-operator z-logical z-lua&quot;&gt;and&lt;&#x2F;span&gt; &lt;span class=&quot;z-support z-function z-builtin z-lua&quot;&gt;type&lt;&#x2F;span&gt;&lt;span class=&quot;z-meta z-function-call z-arguments z-lua&quot;&gt;&lt;span class=&quot;z-meta z-group z-lua&quot;&gt;&lt;span class=&quot;z-punctuation z-section z-group z-begin z-lua&quot;&gt;(&lt;&#x2F;span&gt;&lt;span class=&quot;z-variable z-other z-lua&quot;&gt;thunk&lt;&#x2F;span&gt;&lt;span class=&quot;z-punctuation z-section z-group z-end z-lua&quot;&gt;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt; &lt;span class=&quot;z-keyword z-operator z-comparison z-lua&quot;&gt;==&lt;&#x2F;span&gt; &lt;span class=&quot;z-string z-quoted z-double z-lua&quot;&gt;&lt;span class=&quot;z-punctuation z-definition z-string z-begin z-lua&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;function&lt;span class=&quot;z-punctuation z-definition z-string z-end z-lua&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt; &lt;span class=&quot;z-meta z-block z-lua&quot;&gt;&lt;span class=&quot;z-keyword z-control z-conditional z-lua&quot;&gt;then&lt;&#x2F;span&gt;
+                &lt;span class=&quot;z-variable z-function z-lua&quot;&gt;thunk&lt;&#x2F;span&gt;&lt;span class=&quot;z-meta z-function-call z-arguments z-lua&quot;&gt;&lt;span class=&quot;z-meta z-group z-lua&quot;&gt;&lt;span class=&quot;z-punctuation z-section z-group z-begin z-lua&quot;&gt;(&lt;&#x2F;span&gt;&lt;span class=&quot;z-variable z-other z-lua&quot;&gt;callback&lt;&#x2F;span&gt;&lt;span class=&quot;z-punctuation z-section z-group z-end z-lua&quot;&gt;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+            &lt;span class=&quot;z-keyword z-control z-end z-lua&quot;&gt;end&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+        &lt;span class=&quot;z-keyword z-control z-end z-lua&quot;&gt;end&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;span class=&quot;z-punctuation z-section z-group z-end z-lua&quot;&gt;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+    &lt;span class=&quot;z-keyword z-control z-end z-lua&quot;&gt;end&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;z-keyword z-control z-end z-lua&quot;&gt;end&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The general principle here is that you can compose APIs that use callbacks. This means instead of ending up with a deeply nested callback-hell situation (for which old-school JavaScript is so famous), you&#x27;ll only ever need to be nested at most one level deep. The &lt;code&gt;bindCallback&lt;&#x2F;code&gt; function effectively separates everything into &amp;quot;what came before&amp;quot; and &amp;quot;what comes next&amp;quot;. You could think of it as a lightweight multi-valued promise in a single function. In that sense, this would act a bit like a promises &lt;code&gt;.then&lt;&#x2F;code&gt; method.&lt;&#x2F;p&gt;
+&lt;p&gt;This made wrapping the TTS callback API super simple, though on the other hand:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Using this function isn&#x27;t always the most ergonomic. &lt;&#x2F;li&gt;
+&lt;li&gt;Hiding control flow isn&#x27;t a common Lua idiom, so it might hinder collaboration (for this project: not a big deal)&lt;&#x2F;li&gt;
+&lt;li&gt;This doesn&#x27;t have a great API for early returns or errors. This doesn&#x27;t pair that well with TTS&#x27;s abounding global mutable state&lt;&#x2F;li&gt;
+&lt;li&gt;The simplicity of this approach makes it feel like a half-measure between creating a &lt;em&gt;Reactive Extensions&lt;&#x2F;em&gt; style transducer or using Lua&#x27;s idiomatic and fairly powerful coroutines.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;global-ui&quot;&gt;Global UI&lt;&#x2F;h2&gt;
+&lt;p&gt;Hanabi&#x27;s Global UI system is the stand-out feature of the Mod. It has a custom view for each player and allows players to give hints that interact directly with the cards in player&#x27;s hands.&lt;&#x2F;p&gt;
+&lt;p&gt;TTS allows you to build a retained GUI using XML and then to update it dynamically based on events in game. I quickly realized that attempting to model the UI this way would be error prone. For one, each user&#x27;s state must stay synchronized regardless of the state that the game is saved or loaded from. Also, TTS doesn&#x27;t save any changes made to the UI’s XML between play sessions. &lt;&#x2F;p&gt;
+&lt;p&gt;I used an MVU architecture (Elm-style &lt;em&gt;Model View Update&lt;&#x2F;em&gt;) to simplify the process. This was, I think, one of the big successes of the project as I rarely found myself hunting down bizarre GUI bugs. The amount of game-state to manage for Hanabi is fairly contained, so MVU&#x27;s monolithic nature isn&#x27;t a downside.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;final-thoughts&quot;&gt;Final Thoughts&lt;&#x2F;h1&gt;
+&lt;p&gt;Building Hanabi was fun, though by the time it was ready, many of my friends weren’t playing much TTS anymore. I felt the project was a good intro to some game development concepts. It was also nice to produce a software artifact that non-programmers could understand and enjoy.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>
