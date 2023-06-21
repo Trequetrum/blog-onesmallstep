@@ -16,6 +16,8 @@ This is the first in a series of loosely related posts exploring Types, Type The
 
 # Preface
 
+Soooooooo... what is a type?
+
 The question this blog post is trying to answer can feel rather nebulous. The problem is that in programming languages, types wear many hats. Function overloading lets you create control flow based on types, deriving mechanisms let you generate code based on types, and so forth. Statically dispatched function overloading isn't really about types, it's about saving developers the trouble of coming up with and keeping track of more names for functions. Deriving mechanisms save keystrokes, which is awesome, but types aren't about keystrokes.
 
 My plan here is to dance around the topic a bit. I want to talk about the basic types most programmers are familiar with — for example, integers. I also want to motivate future discussions in other posts about types that are a bit more abstract. For example, types that construct other types, or types that form a mathematical structure called a semiring — which among other things let you use algebra to get nice things for free.
@@ -176,9 +178,9 @@ So instead, let me quote Wikipedia:
 > propositions are often modeled as functions which map a possible world to a truth value. For instance, the proposition that the sky is blue can be modeled as a function which would return the truth value {%emph()%}T{%end%} if given the actual world as input, but would return {%emph()%}F{%end%} if given some alternate world where the sky is green. 
 > - [Wikipedia <sup>(link)</sup>](https://en.wikipedia.org/wiki/Proposition)
 
-Such functions deterministically tell us how to interpret any proposition as {%emph()%}T{%end%} or {%emph()%}F{%end%} and imbue the entire enterprise with a structured meaning that is interesting. 
+Such functions deterministically tell us how to interpret any proposition as {%emph()%}T{%end%} or {%emph()%}F{%end%}. If they interpret the logical connectives properly, they imbue the entire enterprise with a structured meaning that is interesting by design.
 
-As a cool aside, if you view {%emph()%}T{%end%} as the singleton set and {%emph()%}F{%end%} as the empty set, you can see the standard set theoretic semantics of propositional logic as a generalization of this semantic interpretation of predicate logic. So you can define the functions above using truth tables (in the style I used earlier) or you can define them as set operations like unions, intersections and such. The approaches are the same (up to isomorphism).
+As a cool aside, if you view {%emph()%}T{%end%} as the singleton set and {%emph()%}F{%end%} as the empty set, you can see the standard set theoretic semantics of propositional logic as a generalization of this semantic interpretation of predicate logic. So you can define the logical connectives above using truth tables (in the style I used earlier) or you can define them as set operations like unions, intersections and such. The approaches are the same (up to isomorphism).
 
 # About Types
 
