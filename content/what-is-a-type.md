@@ -18,11 +18,11 @@ This is the first in a series of loosely related posts exploring Types, Type The
 
 Soooooooo... what is a type?
 
-The question this blog post is trying to answer can feel rather nebulous. The problem is that in programming languages, types wear many hats. Function overloading lets you create control flow based on types, deriving mechanisms let you generate code based on types, and so forth. Statically dispatched function overloading isn't really about types, it's about saving developers the trouble of coming up with and keeping track of more names for functions. Deriving mechanisms save keystrokes, which is awesome, but types aren't about keystrokes.
+The question this blog post is trying to answer can feel rather nebulous. The problem is that in programming languages, types wear many hats. Function overloading lets you create control flow based on types, deriving mechanisms let you generate code based on types, IDEs provide some of their tooling based on type definitions, and so forth.
 
 My plan here is to dance around the topic a bit. I want to talk about the basic types most programmers are familiar with — for example, integers. I also want to motivate future discussions in other posts about types that are a bit more abstract. For example, types that construct other types, or types that form a mathematical structure called a semiring — which among other things let you use algebra to get nice things for free.
 
-One of the things I've hoped to avoid is to mystify types (I'm not sure whether I've succeeded). While types seem to get at the fundamentals of what abstraction is about, they're also very natural. Assembly programmers have been using types since before we developed syntax for them or automated ways to enforce/check them. What I'm trying to dance around here really shouldn't invalidate anything about the types you are already familiar with. Nobody has lied to you about {%emph(c="blue")%}Booleans{%end%} or {%emph(c="blue")%}Strings{%end%}, they continue to be what you've always known. 
+One of the things I've hoped to avoid doing here is to mystify types (I'm not sure whether I've succeeded). While types seem to get at the fundamentals of what abstraction is about, they're also very natural. Assembly programmers have been using types since before we developed syntax for them or automated ways to enforce/check them. What I'm trying to dance around here really shouldn't invalidate anything about the types you are already familiar with. Nobody has lied to you about {%emph(c="blue")%}Booleans{%end%} or {%emph(c="blue")%}Strings{%end%}, they continue to be what you've always known. 
 
 {%aside()%}
 Once you've studied types for a bit, things that seemed completely unrelated before can start to look like pretty much the same thing. Hidden inside a signed integer (or any sum type), is the essential structure of "making a choice", which is what an `if` statement is about as well.
@@ -42,7 +42,7 @@ While tackling this topic, I'm hoping that you have some (perhaps partially forg
 
 While I don't want to turn this is an introduction to propositional logic, lets take a quick moment to refresh our memories on the two ways you can show that `A ∧ B` entails `B ∧ A` in propositional logic.
 
-### The Semantic Proof
+### Semantic Entailment
 
 The first way you can show that `A ∧ B` entails `B ∧ A` in propositional logic is via a semantic proof. You've probably seen these done via tables (often called "truth tables") like so:
 
@@ -84,16 +84,12 @@ Implicit in this table is the meaning of `A` and the meaning of `B`. To make thi
 We say that `A ∧ B ⊨ B ∧ A` because when we ask what `A ∧ B`, and `B ∧ A` means, in every instance where `A ∧ B` is `T`, `B ∧ A` is also `T` (More generally, we can understand `⊨` here as a relationship between specific rows and columns on a truth table). This is pretty easy in this case because we can exhaustively look at every possibility: All four of them!
 
 {%aside()%}
-Maybe you think the answer to a question like "what does `A` mean?" should be something like "A stands for 'grass is green'". In philosophy, it's common to pick linguistic propositions that we know the truth of instead of picking `T` or `F` directly. Really, what you're doing is picking a line from the table above. 
-
-I suppose you may pick a proposition you don’t know the truth of. Lets say `A` stands for *"I will never win the lottery"* and `B` stands for *"pigs can fly"*; you can think of picking a linguistic proposition that we don't know the truth of as either nonsense or as a way to look at two lines in the table above. This case is semantically interesting because we know the truth of `B`, we can see that `A ∧ B` is `F` regardless of how we interpret `A`. 
-
-This habit of matching propositional symbols with linguistic phrases is only done for historical reasons or to motivate learning. The underlying semantics is about `T` and `F` regardless of the linguistics you use as a stand-in. We'll look at what sort of objects propositions are a bit more below.
+Maybe you think the answer to a question like "what does `A` mean?" should be something like "A stands for 'grass is green'". In philosophy, it's common to pick linguistic propositions that we can interpret some truth value for instead of picking `T` or `F` directly. Either *'it is raining'* or not. Because our interpretations are blind to the difference between `A` and *'grass is green'*, we're avoiding linguistic tricks like `A` stands for *"this proposition is false"* or `A` stands for *"Not `A`"* by dint of interpreting only symbols and logical connectives.
 {%end%}
 
 So it turns out that in propositional logic specifically, you can always discover whether `A ⊨ B` by building a truth table. Building these tables quickly gets tiresome and other logics don’t can’t be exhaustively searched this way, so there’s another way to show this entailment. 
 
-### Entailment using a Proof System
+### Proof System Entailment
 
 The second way you can prove that that `A ∧ B` entails `B ∧ A` in propositional logic is via its proof system. 
 
@@ -126,7 +122,7 @@ I'm not going to go over proof rules. I'm assuming that even if you've forgotten
   </tr>
 </table>
 
-We say that `A ∧ B ⊢ B ∧ A` because we have a proof system where if we assume `A ∧ B`, there exists some number of legal lines after which we can legally write `B ∧ A`. We can understand `⊢` as a purely syntactic game because we never need to reference `T`, or `F`, or tables or any such thing. This becomes an interesting game to us because we've designed it so that it can only generate propositions for which `⊨` also holds. We have a term for this relationship. Having this property where `A ⊢ B` implies `A ⊨ B` makes a proof system {%emph()%}sound{%end%}. (Perhaps less interestingly; for propositional logic it is also the case that `A ⊨ B` implies `A ⊢ B`, which makes propositional logic’s proof system {%emph()%}complete{%end%}). 
+We say that `A ∧ B ⊢ B ∧ A` because we have a proof system where if we assume `A ∧ B`, there exists some number of legal lines after which we can legally write `B ∧ A`. We can understand `⊢` as a purely syntactic game because we never need to reference `T`, or `F`, or tables or any such thing. This becomes an interesting game to us because we've designed it so that it can only generate propositions for which `⊨` also holds. We have a term for this relationship. Having this property where `A ⊢ B` entails `A ⊨ B` makes a proof system {%emph()%}sound{%end%}. (Perhaps less interestingly; for propositional logic it is also the case that `A ⊨ B` entails `A ⊢ B`, which makes propositional logic’s proof system {%emph()%}complete{%end%}). 
 
 ### Propositional Proofs in General
 
@@ -180,7 +176,13 @@ So instead, let me quote Wikipedia:
 
 Such functions deterministically tell us how to interpret any proposition as {%emph()%}T{%end%} or {%emph()%}F{%end%}. If they interpret the logical connectives properly, they imbue the entire enterprise with a structured meaning that is interesting by design.
 
-As a cool aside, if you view {%emph()%}T{%end%} as the singleton set and {%emph()%}F{%end%} as the empty set, you can see the standard set theoretic semantics of propositional logic as a generalization of this semantic interpretation of predicate logic. So you can define the logical connectives above using truth tables (in the style I used earlier) or you can define them as set operations like unions, intersections and such. The approaches are the same (up to isomorphism).
+{%aside()%}
+Two quick notes on the side:
+
+1. If you view **T** as the singleton set and **F** as the empty set, you can see the standard set theoretic semantics of propositional logic as a generalization of this semantic interpretation of predicate logic. So you can define the logical connectives above using truth tables (in the style I used earlier) or you can define them as set operations like unions, intersections and such. The approaches are the same (up to isomorphism).
+
+2. I'm writting a post which models the semantics of propositions in Lambda Calculus using JavaScript you can easily run in your browser. I'll link it here. It's a completely useless excersize for day-to-day programming, but it completely amazed me and I hope it does the same for you.
+{%end%}
 
 # About Types
 
@@ -188,9 +190,9 @@ Types are a syntactic tool for abstraction and can be talked about purely as a w
 
 Typically a type theory will have a few base types and then a few type-forming rules. Then types are straightforwardly defined as the (potentially infinite) hierarchy of types that can be generated. This is defining types by just looking at the syntactic game that creates them — seem familiar?.
 
-So really, what's the point of the syntactic type game loosely described above? Types as they're discussed in the more advanced type theory circles have a direct categorical semantics. A friend of mine jokingly says "category theory is general abstract nonsense" (based on how prominent representatives of the mathematical community reacted to its introduction), so we're going to shy away from that for the moment.
+So really, what's the point of the syntactic type game loosely described above? Types as they're discussed in the more advanced type theory circles have a direct categorical semantics. As friend of mine jokingly says, "category theory is general abstract nonsense" (based on how prominent representatives of the mathematical community reacted to its introduction), so we're going to shy away from that for the moment.
 
-One way to model the semantics of types of a simple type theory is as sets of values. To quote:
+A way to model the semantics of types of a simple type theory is as sets of values. To quote:
 
 > "Types” denote nonempty sets of values; they are used to restrict the scope of variables, control the formation of expressions, and classify expressions by their values. 
 > - William M. Farmer <sup>[(link)](http://imps.mcmaster.ca/doc/seven-virtues.pdf)</sup>
@@ -290,9 +292,37 @@ This is a whole can of worms and there's more to say on this topic. Let's leave 
 
 # A More Nuanced View on Types
 
-To develop a nuanced view of what types you need to understand them in the context of how and why they're used. What motivates the use of types? A simple answer might be "so that the compiler can calculate how much memory some data takes and how to represent the data in memory so that I don't have to do it myself". To support this line of reasoning, languages that have a type system always give you a way to build more complex types from simpler types. Lets run with an example, most languages allow you to define a new product type called a pair from any other two types: `∀ A:type B:type | (A, B):type`. This reads "The pairing of any two types is itself a type". A use for this is that the compiler can understand how a type can be represented based on its construction. For each way you can build up more complex types (like `∀ A:type | [A]:type`, or `∀ A:type | Vec<A>:type`), you can equip the compiler with rules to let it understand what to do with that new type.
+To develop a nuanced view of what types you need to understand them in the context of how and why they're used. What motivates the use of types? When we look at the ways in which they're used in older imperative programming languages, a simple answer might be "so that the compiler can calculate how much memory some data takes and how to represent (persist) the data in memory so that I don't have to do it myself". To support this line of reasoning, these languages always give you a way to build more complex types from simpler types. Lets run with an example, most languages allow you to define a new product type called a pair from any other two types: `∀ A:type B:type | (A, B):type`. This reads "The pairing of any two types is itself a type". A use for this is that the compiler can understand how a type can be represented based on its construction. How a pair is persisted in memory depends on the types in question, but you can describe what to do generically. For each way you can build up more complex types (like `∀ A:type | [A]:type`, or `∀ A:type | Vec<A>:type`), you can equip the compiler with rules that let it understand what to do. So the compilor contains something like function from types to memory layout, but just like you can create new proposition using the logical connectives, you can create new types using some given connectives.
 
-There's a deeper structure here, because just like predicates and propositions become useful in the context of a logic that declares how they can be juxtaposed with various operators (syntax) and a model for how to evaluate any legal syntax to it's meaning (semantics). Types become useful in the context of a theory that declares how they can be juxtaposed with various operators (syntax) and a model for how to evaluate any legal syntax to it's meaning (semantics). You're abstracting something more interesting than "memory layout" when you build types and let the compiler figure out the rest.
+It turns out that we want the rules for how to persist a type in memory to have some predictable mathimatical structure. Like if we want to let the compilor optimise memory layouts, we need to feed it rules for how types can be re-written. Why should we allow the following re-write:
+
+```
+Point {
+  x: Int,
+  y: Int
+}
+GameNode {
+  tag: String,
+  parent: Point,
+  pos: Point
+}
+```
+to
+```
+GameNode {
+  tag: String,
+  parent_x: Int,
+  parent_y: Int,
+  pos_x: Int,
+  pos_y: Int
+}
+```
+or even
+```
+GameNode (String, Int, Int, Int, Int)
+```
+
+There's a deeper structure here, because just like predicates and propositions become useful in the context of a logic that declares how they can be juxtaposed with various operators (syntax) and a model for how to evaluate any legal syntax to it's meaning (semantics). Types become useful in the context of a theory that declares how they can be juxtaposed with various operators (syntax) and a model for how to evaluate any legal syntax to it's meaning (semantics). You're abstracting something more interesting than "memory layout" when you build types and let the compiler figure out the rest. You're actually annotating your program with a system that has a structure you can hijack for your own means to enforce program-wide properties. 
 
 I don't think the following is necessary to develop a deeper understanding of types, but if you've taken a course or done some reading on {%emph()%}first-order logic{%end%}, then I recommend perusing [this paper (link)](http://imps.mcmaster.ca/doc/seven-virtues.pdf). It's a paper that hopes to recommend teaching a simplified type theory to undergrads. Assuming you have a bit of background with first-order logic, the paper is very accessible. A highlight is where it shows that although simple type theory has none of the propositional connectives or quantifiers, they can all be easily defined in simple type theory using function application, function abstraction, and equality. I'll let the paper speak for itself, but to me the power of Simple Type Theory is that is has a very uniform syntax, but hidden within a hierarchy of types is the full power of higher-order predicate logic.
 
@@ -302,6 +332,6 @@ The theory presented in the paper is type theory boiled down to its essence. It 
 
 The thing to consider then, is that when a computer scientist is using {%emph(c="blue")%}Int{%end%} to label a variable, they can be seen as abstracting away the representation of an {%emph(c="blue")%}Int{%end%}'s value as a series of bits, or as annotating their program with something akin to a logic. What's been done when annotating a variable with an {%emph()%}Int{%end%} is very simple, but as you build complex types from simpler types and construct tuples, lists, sets, etc you're building up more complex logical expressions that let you abstract away the representation of increasingly complex data. You can use function abstraction to view programs themselves as sequences of bits that need abstracting. This lets a developer create boundaries across which the way in which entire parts of your program are represented is abstracted.
 
-In functional programming languages with relatively expressive type systems, it's very common to see the sorts of choices made in imperative languages being encoded as types instead. That way instead of writing out `if, else if, else` statements, you generate a value of some type and by cleverly encoding how these types are allowed to be composed, you're on you way to ensuring certain bad sequences of choices (now types) are not possible to create without a type error. Carefully crafting and letting a type system enforce such invariants for you matters more as software seize, number of developers, and magnitude of maintenance increases.
+In functional programming languages with relatively expressive type systems, it's very common to see the sorts of choices made in imperative languages being encoded as types instead. That way instead of writing out `if, else if, else` statements, you generate a value of some type and by cleverly encoding how these types are allowed to be composed, you're on you way to ensuring certain bad sequences of choices (now types) are not possible to create without a type error. Carefully crafting and letting a type system enforce such invariants for you matters more as software size, number of developers, and magnitude of maintenance increases.
 
 At a minimum you're adding a logic system that sits on-top of your program and describes some part of it (for example: Java, C#, TypeScript, Go, etc). At the extreme end, you've realized the depths of the {%emph()%}Curry–Howard Correspondence{%end%} and you're a developer writing executable math proofs (for example: Idris, Agda, Coq, Lean, etc).
