@@ -14,7 +14,7 @@ keywords = "Syntax, Semantics, Logic, Math, Foundation, Programming, Language, L
 
 # Prelude
 
-This is a contrived imaginary sequence of thoughts that one could potentially have; the net result of which would be discovering the Y-Combinator. It's done from the perspective of a computer scientist, not a mathematician. We'll jump right in with Python. We're going to start with a very simple function and a contrived restriction, then keep taking little steps to abstract a bit at a time.
+This is an imaginary sequence of thoughts that one could potentially have; the net result of which would be discovering the Y-Combinator. It's done from the perspective of a computer scientist, not a mathematician. We'll jump right in with Python. We're going to start with a very simple function and a contrived restriction, then keep taking little steps to abstract a bit at a time.
 
 I take it if you've stumbled upon this article, you've heard about λ-Calculus and know a bit about it's role in specifying the denotational semantics of functional languages. What many people don't realize is that just about all modern languages have small λ-like constructs built in and through that optimizations and abstractions learned from the functional world can sometimes be applied in imperative settings.
 
@@ -119,7 +119,7 @@ However, we're now in a better place than we were before because `r` doesn't dep
 ```Python
 # 1. r = lambda f, n: 1 if n==0 else n * f(f, n-1)
 # 2. r(r,5)
-# Substitute r from line 1 into place of both r in line 2
+# Substitute r from line 1 in-place of both r in line 2
 (lambda f, n: 1 if n==0 else n * f(f, n-1))((lambda f, n: 1 if n==0 else n * f(f, n-1)), 5)
 ```
 ```Output
@@ -146,7 +146,7 @@ This is pretty easy, as it turns out. We'll parameterize the `5` in the snippet 
 
 So now we can call this in-line with a simple number and the function calls itself with the correct parameters and we're off to the races again.
 
-We're now at the point where we've accomplished the first task that we set out to accomplish. We've created an anonymous version of factorial. We can call it a few times with different values and compare it against the standard non-anonymous version just to convince ourselves this really works.
+We're now at the point where we've accomplished the first task that we set out to accomplish. We've created an anonymous version of `factorial`. We can call it a few times with different values and compare it against the standard non-anonymous version just to convince ourselves this really works.
 
 ```Python
 factorial = lambda n: 1 if n==0 else n * factorial(n-1)
@@ -163,7 +163,7 @@ list(fact_test(n) for n in [5,7,10,13,20])
 [True, True, True, True, True]
 ```
 
-We're just mucking about, so seeing this output is good enough for now. We could stop here, but our anonymous factorial is pretty ugly and our aesthetic senses are tingling. This could be made neater/nicer.
+We're just mucking about, so seeing this output is good enough for now. We could stop here, but our anonymous `factorial` is pretty ugly and our aesthetic senses are tingling. This could be made neater/nicer.
 
 Before we work on that problem, we'll make what we already have a bit easier to digest by allowing names again. We'll have to keep in mind that names are supposed to be a shorthand for "copy the definition" rather than a reference to an object that exists. Keeping everything anonymous ensures we’re correct, but it’s rather verbose. So, in lieu of being verbose, we'll allow names so long as they could be trivially replaced with anonymous versions.
 
@@ -193,7 +193,7 @@ def any_name(f, *any_other_args):
     # ...
     # Recursive call
     f(f, any_computed, values, here)
-    # Any code you want, probably a base case
+    # Any code you want
     # ...
     return something
 ```
@@ -238,7 +238,7 @@ We got the right answer, so this system seems to be working for us.
 
 # Pre-applied Recursion
 
-In every one of our recursive form functions, the second requirement is that we're always going to need to call `f` with itself:
+In every one of our anonymous recursive form of functions, the second requirement is that we're always going to need to call `f` with itself:
 
 ```Python
 # Factorial
@@ -252,15 +252,17 @@ lambda f, a, b: a if b % a == 0 else f(f, b % a, a)
 
 This is a small, but repetitive step. Its possible to get this step wrong and create some pretty bizarre control flow. 
 
-It's also a rule that should seem a bit suspicious. The first rule is what lets us create a recursive call, but the second one is just an extra bit of bookkeeping. We should think about whether this is accidental or essential complexity. Consider that we've already created a function called `M` that removes our need to call `f` with itself. Right now we're only using it as a final step, but it's proof that this transformation is possible.
+It's also a rule that should seem a bit suspicious. The first rule is what lets us create a recursive call, but the second rule is just an extra bit of bookkeeping. We should think about whether this is accidental or essential complexity. Consider that we've already created a function called `M` that removes our need to call `f` with itself. Right now we're only using it as a final step, but it's proof that this transformation is possible.
 
 Really, as a point of pride and a matter of principle, we want this step gone. The puzzle here is: how? Where could we possibly call `M` again so that the `f` can get into its final form a bit earlier. 
 
-The first hint is this, you can take any function `f` and wrap it without changing its behaviour. It looks just like `M` but without the self-call to `f`.
+The first hint is this, you can take any function `f` and wrap it without changing its behaviour. Earlier we did a more complicated verson of this exact thing. Our `no_op` wrapper actually looks a lot like `M`. We just leave out the self-call to `f`.
 
 No matter how many times you pass a function to `no_op`, you get the same function back. 
 
 ```Python
+M = lambda f: lambda *a, **kw: f(f, *a, **kw)
+
 factorial = M(lambda f, n: 1 if n==0 else n * f(f, n-1))
 no_op = lambda f: lambda *a, **kw: f(   *a, **kw)
 
@@ -276,9 +278,11 @@ no_op(no_op(no_op(no_op(factorial))))(5)\
 True
 ```
 
-In the code above, no_op doesn't do anything except waste a bit of electricity. Let's take this idea and expand it out for factorial to see it at work:
+In the code above, `no_op` doesn't do anything except waste a bit of electricity. Let's take this idea and expand it out for factorial to see it at work:
 
 ```Python
+M = lambda f: lambda *a, **kw: f(f, *a, **kw)
+
 M(                lambda f, n: 1 if n==0 else n * f(f, n-1)         )(5)\
     ==                                                                  \
 M(lambda fι, nι: (lambda f, n: 1 if n==0 else n * f(f, n-1))(fι, nι))(5)\
@@ -298,7 +302,9 @@ M(lambda fι, nι: (lambda f, n: 1 if n==0 else n * f(n-1))(M(fι), nι))(5)
 120
 ```
 
-In doing this, we've crested the hill. The expression we're wrapping no longer requires `f` to pass itself forward on each subsequent call. The rest of the work should more or less be standard stuff to clean up the work we've done so that instead of working for just the given recursive expression, we can create a function that will work for **any** similar recursive expression.
+In doing this, we've crested the hill. 
+
+The expression we're wrapping no longer requires `f` to pass itself forward on each subsequent call. The rest of the work should more or less be standard stuff to clean up the work we've done so that instead of working for just the given recursive expression, we can create a function that will work for **any** similar recursive expression.
 
 Lets update the rules for what you must do to be a similar recursive expression
 
@@ -310,9 +316,10 @@ That feels nice.
 Now for that cleanup. Lets remove the new factorial sub-expression:
 
 ```Python
+M = lambda f: lambda *a, **kw: f(f, *a, **kw)
 r = lambda f, n: 1 if n==0 else n * f(n-1)
+
 M(lambda f, n: r(M(f), n))(5)
-# 120
 ```
 ```Output
 120
@@ -321,6 +328,7 @@ M(lambda f, n: r(M(f), n))(5)
 Let's parameterize `r` by creating a function that takes in a function like `r` and does all the recursive work we've just figured out. Remember that while the `r` above just takes a parameter n, we don't make that assumption when we parametrize. Instead we'll replace `n` with any {%emph()%}args{%end%} or {%emph()%}kwargs{%end%}
 
 ```Python
+M = lambda f: lambda *a, **kw: f(f, *a, **kw)
 def fix(r):
     return M(lambda f, *a, **kw: r(M(f), *a, **kw))
 ```
@@ -344,16 +352,16 @@ fix( # GCD
 14
 ```
 
-Which gets us to a really nice place. We can create any recursive function anonymously if we just include `f` as the first parameter and call it exactly the same way we'd make our recursive calls usually.
+Which gets us to a really nice place. Using fix, we can create any recursive function anonymously if we just include `f` as the first parameter and call it exactly the same way we'd make our recursive calls usually.
 
 ```Python
 fact =     lambda    n: 1 if n==0 else n * FACT(n-1)
 # becomes
-fact = fix(lambda f, n: 1 if n==0 else n *    f(n-1) )
+fact = fix(lambda f, n: 1 if n==0 else n *    f(n-1))
 #--------------------------------------------------------------
 gcd  =     lambda    a, b: a if b % a == 0 else gcd(b % a, a)
 # becomes
-gcd  = fix(lambda f, a, b: a if b % a == 0 else   f(b % a, a) )
+gcd  = fix(lambda f, a, b: a if b % a == 0 else   f(b % a, a))
 ```
 
 # fix is the Y-Combinator
@@ -362,27 +370,37 @@ Fix is actually the Y-Combinator with some `*a` and `**kw` thrown in to allow us
 
 So, if the steps we took along the way didn’t throw you for a loop, you can now derive the  Y-Combinator for yourself! Exciting!
 
-Let's take our definitions, drop the `*a` and `**kw` stuff and see what it looks like. These are superficial changes from the point of view of λ-calc but would require you to fully curry every function and to be careful about eager evaluation before these transformations would work well with a Python interpreter (an exercise left for the reader).
+# Appendix
+
+Let's take our definitions, drop the `*a` and `**kw` stuff and see what it looks like. In λ-calc, doing this is akin to something called an {%emph()%}η-reduction{%end%}. In Python, this reduction isn't as straight forward. So while the code below is Python-like, don't take it too seriously. We play a bit fast a loose with the syntax here so that if you see this stuff in the wild, you may recognise it.
+
+This is really the least important part of the article :)
 
 ```Python
 M = lambda f: lambda *a, **kw: f(f, *a, **kw)
-# becomes 
+# η-reduction (Drop extra arguements that are just passed through)
 M = lambda f: f(f)
+# α-conversion (Rename variables)
+M = lambda x: x(x)
 
 fix = lambda r: M(lambda f, *a, **kw: r(M(f), *a, **kw))
-# becomes
+# η-reduction (Drop extra arguements)
 fix = lambda r: M(lambda f: r(M(f)))
-# expand the first M, expand and simplify the second M
-fix = lambda r: (lambda f: f(f))(lambda f: r(f(f)))
-# β reduction (It’s just a function application)
-fix = lambda r: (lambda f: t(f(f)))(lambda f: r(f(f)))
+# expand the first and second M
+fix = lambda r: (lambda x: x(x))lambda f: r(((lambda x: x(x)))(f)))
+# β reduction (Apply f to the second M)
+fix = lambda r: (lambda x: x(x))(lambda f: r(f(f)))
+# β reduction (Apply expression on the right to the first M)
+fix = lambda r: (lambda f: r(f(f)))(lambda f: r(f(f)))
 # α-conversion (Rename variables)
 # This is Y as given by Curry
 Y = lambda f: (lambda x: f(x(x)))(lambda x: f(x(x)))
 
 # λ-Calc notation
 Y = λf.(λx.f(xx))(λx.f(xx))
-# Or the version we need in python to force lazy execution
+# Or the version we need in eager evaluation languages like python to 
+# force lazy execution. So this is a bit closer to the fix function we
+# derived in this article
 Z = λf.(λx.f(λz.xxz))(λx.f(λz.xxz))
   = λf.(λx.xx)       (λf.t(λz.ffz))
 ```
