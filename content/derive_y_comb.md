@@ -172,14 +172,15 @@ We could stop here, this really isn't too bad. Though of note is that right now 
 For example:
 
 ```Python
-greatest_common_denominator = lambda a, b: a if b % a == 0 else greatest_common_denominator(b % a, a)
+#greatest common denominator
+gcd = lambda a, b: a if b % a == 0 else gcd(b % a, a)
 # Anonymous rewrite
 r = lambda f, a, b: a if b % a == 0 else f(f, b % a, a)
 
 (lambda a, b: r(r,a,b))(42, 28)
 ```
 
-This wrapper function isn't really doing anything special, so instead of a wrapper for `factorial` and another wrapper for `greatest_common_denominator`. We can generate wrappers automatically for any similar recursive function expression. 
+This wrapper function isn't really doing anything special, so instead of a wrapper for `factorial` and another wrapper for `gcd`. We can generate wrappers automatically for any similar recursive function expression. 
 
 First, lets describe what it means to be a "*similar recursive function expression*". There are two criteria.
 
