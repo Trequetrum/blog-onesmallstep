@@ -384,20 +384,20 @@ Let's take our definitions, drop the `*a` and `**kw` stuff and see what it looks
 This is really the least important part of the article :)
 
 ```Python
-M = lambda f: lambda *a, **kw: f(f, *a, **kw)
+mock = lambda f: lambda *a, **kw: f(f, *a, **kw)
 # η-reduction (Drop extra arguements that are just passed through)
-M = lambda f: f(f)
+mock = lambda f: f(f)
 # α-conversion (Rename variables)
-M = lambda x: x(x)
+mock = lambda x: x(x)
 
-fix = lambda r: M(lambda f, *a, **kw: r(M(f), *a, **kw))
+fix = lambda r: mock(lambda f, *a, **kw: r(mock(f), *a, **kw))
 # η-reduction (Drop extra arguements)
-fix = lambda r: M(lambda f: r(M(f)))
-# expand the first and second M
+fix = lambda r: mock(lambda f: r(mock(f)))
+# expand the first and second mock
 fix = lambda r: (lambda x: x(x))(lambda f: r(((lambda x: x(x)))(f)))
-# β reduction (Apply f to the second M)
+# β reduction (Apply f to the second mock)
 fix = lambda r: (lambda x: x(x))(lambda f: r(f(f)))
-# β reduction (Apply expression on the right to the first M)
+# β reduction (Apply expression on the right to the first mock)
 fix = lambda r: (lambda f: r(f(f)))(lambda f: r(f(f)))
 # α-conversion (Rename variables)
 # This is Y as given by Curry
