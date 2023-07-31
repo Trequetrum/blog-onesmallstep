@@ -16,7 +16,7 @@ keywords = "Syntax, Semantics, Logic, Math, Foundation, Programming, Language, L
 
 Why would you want to know how to derive the Y-Combinator? Well, mostly for interest's own sake. Modern languages all ship with built-in constructs for recursion so you'll never be required to do something like this.
 
-Curry's presentation of the fixed-point combinator for λ-Calculus (sometime in the late 1930's, I can't find a concrete source) is one of a few cornerstone results that has shaped the world of computing. It's a common misconception that electrical computers begat — or at least motivated — study into computation, complexity analysis, universal decidability, and so on.
+Curry's presentation of the fixed-point combinator for λ-Calculus (sometime in the late 1930's, I can't find a concrete source) is one of a few cornerstone results that has shaped the world of computing. It's a common misconception that electrical computers begat — or at least motivated — study into computation, complexity analysis, universal decidability, and so on. There's a storied history of logicians delving into the topic long before anyone imagined we would be teaching silicon how to think.
 
 Curry's Y-combinator is both a very elegant formal definition of recursion, and an entrypoint into understanding why developing bug-proof software is systemically difficult.
 
