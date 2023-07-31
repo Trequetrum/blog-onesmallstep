@@ -200,7 +200,7 @@ def any_name(f, *any_other_args):
     return something
 ```
 
-We're going to write a function `mock` (as a reference to *"To Mock a Mockingbird"*) that generates these wrappers automatically for us. Since this wrapper is a new function, we're going to have to define a function inside of a function.
+We're going to write a function `mock` (as a reference to the *"To Mock a Mockingbird"* puzzle book) that generates these wrappers automatically for us. Since this wrapper is a new function, we're going to have to define a function inside of a function.
 
 ```Python
 def mock(f): 
