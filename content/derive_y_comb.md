@@ -361,7 +361,7 @@ fix( # GCD
 Which gets us to a really nice place. Using fix, we can create any recursive function anonymously if we just include `f` as the first parameter and call it exactly the same way we'd make our recursive calls usually.
 
 ```Python
-fact =     lambda    n: 1 if n==0 else n * FACT(n-1)
+fact =     lambda    n: 1 if n==0 else n * fact(n-1)
 # becomes
 fact = fix(lambda f, n: 1 if n==0 else n *    f(n-1))
 #--------------------------------------------------------------
