@@ -24,19 +24,58 @@ My plan here is to dance around the topic a bit. I want to talk about the basic 
 
 One of the things I've hoped to avoid doing here is to mystify types (I'm not sure whether I've succeeded). While types seem to get at the fundamentals of what abstraction is about, they're also very natural. Assembly programmers have been using types since before we developed syntax for them or automated ways to enforce/check them. What I'm trying to dance around here really shouldn't invalidate anything about the types you are already familiar with. Nobody has lied to you about {%emph(c="blue")%}Booleans{%end%} or {%emph(c="blue")%}Strings{%end%}, they continue to be what you've always known. 
 
-{%aside()%}
-Once you've studied types for a bit, things that seemed completely unrelated before can start to look like pretty much the same thing. Hidden inside a signed integer (or any sum type), is the essential structure of "making a choice", which is what an `if` statement is about as well.
+We're going to start with what I undertand the general pragmatic view of types to be, then I'm going to detour us into some super basic Propositional Logic and hopefully come full circle into a very vague understanding of types and how we might change our view on what it means to annotate a program with them.
 
-If you look at a jump statement (which abstract into **If** statments, **Loops**, and such) as a mathematical object, you end up with something that looks like it has the same structure as a **choice type**, or an **exlusive OR**, or even (perhaps surprisingly) an **addition**. 
+# The Pragmatic View of Types in Computer Science
 
-When you have instructions that don't depend on one another, you end up with something that looks like it has the same structure as **pair types**, or **logical AND**, or even **multiplication**.
+> [A] computer is unable to discriminate between for example a memory address and an instruction code, or between a character, an integer, or a floating-point number, because it makes no intrinsic distinction between any of the possible values that a sequence of bits might *mean*
+>
+> [...]
+>
+> Assigning a data type, termed typing, gives *meaning* to a sequence of bits such as a value in memory
+> - [Wikipedia <sup>(link)</sup>](https://en.wikipedia.org/wiki/Type_system)
 
-This probably all seems like abstract nonsense, and it is :P. But; it's cool.
-{%end%}
+Consider the following sequence of bits:
 
-We're not going to get into any anything like looking at any specific types here. Instead, I'm going to detour us into some super basic Propositional Logic and hopefully come full circle into a very vague understanding of types and how we might change our view on what it means to annotate a program with them.
+```
+10000001
+```
+
+What could this sequence of bits represent as a value?
+
+ - If that's an unsigned 8bit integer, then it could represent a `129`.
+ - It also could represent any constant transformation of an 8bit integer:
+   - Absolute negative value: `-129`
+   - Thousands: `129,000`
+   - Even numbers: `258`
+ - If that's a signed 8bit integer:
+   - It could represent a `-1`
+   - If it is in 2s complement then `-127`
+ - If the bit that carries the sign isn't the standard one, there's a whole other set of numbers this could represent.
+ - It could be an array of two unsigned 4bit integers: `[8,1]`
+ - The value may not be an integer at all. Getting more outlandish, it might be a bit-map for items in an adventurer's backpack. In which case this might encode two specific key items (item-id `0` and `7`) out of eight key items an adventurer will need to find during their quest! 
+ - This value could be a memory address on a **very** small embedded system, or perhaps the system pads this with zeros to interpret it as a memory address.
+ - This could be a machine instruction code of some sort.
+ - This could be a path through a binary tree.
+ - The above considerations also depend on the "endianness" of the memory layout as well.
+
+You can see the problem. You cannot tell the type of this value by inspecting its bits. Giving those bits a type is the process by which we imbue them with meaning. It doesn't matter that assembly has no means to annotate types and no automated way to check them, any programmer using assembly must do that work manually — they can not reasonably choose to avoid it. For example: it's never desirable to multiply two memory addresses together, so an assembly programmer does their best to avoid doing so. Failing in this task isn't a type error within the language, but it is still a type error conceptually and will result in an incorrect program.
+
+Programmers need to reason about the types of the data they are working with in order to ensure that their programs are correct.
+
+# A more abstract view of types
+
+The pragmatic view of types really bundles up the idea of capturing how data is represented. This is not typically how types act while programming. Consider how often a developer even sees the sequence of bits that represent the values they use. Especially in the basic nominal cases, developers leave the bit-fiddling to low-level operations. It really doeasn't matter if a `-5` looks like `1000 0101` or `1111 1011`, so long as the operations (like addition and so on) work as expected.
+
+In general, programmers consider even the most fundamental types to have an existential representation. A well behaved representation exists (because it must), but any other well behaved representation would do just as well. The type system forms an abstraction boundary so that so long as the API of an {%emph(c="blue")%}int{%end%} doesn't change, the representation is largely irrelevant <sup>[1]</sup>.
+
+Instead of "giving meaning" to a sequence of bits, types can be seen in some ways as the opposite. They describe a program that's provably generic over the representation, which means a Java Class doesn't describe a program, but instead a whole set of programs (at least one program for each possible representation of {%emph(c="blue")%}int{%end%}). It just so happens we pick binary representations that work well with our hardware.
+
+In some languages there are pragmatic reasons (say performance/memory) to care about the representation or some part of the representation. Because of its pedigree as a systems language, Rust has 12 different integer types, though they differ on whether they are signed (support negative integers) and how much memory they require, they don't differ on any other representational decisions such as which bit is the most significant, which bit is signed, or whether signed numbers are in two's complement. Even here, the types act to abstract exactly those choices developers want to stop caring about.
 
 # Type Systems share some Similarities with Proof Systems
+
+So if it's not really about giving sequences of bits meaning, is there a different way to look at types?
 
 While tackling this topic, I'm hoping that you have some (perhaps partially forgotten) introductory-level knowledge of formal logic. If you’re like me, you may have encountered some propositional logic in your Grade 11 Discrete Mathematics course, or perhaps a few years later in undergraduate philosophy. I'm not going to lean on it in any in-depth way in this blog, but its a nice building block for understanding type systems and in turn, types.
 
@@ -138,7 +177,9 @@ So what does all this propositional logic have to do with Type Systems and with 
 
 Well, type systems and proof systems have a lot of similar properties. They both have a clean separation of syntax and semantics, they both offer a purely syntactic set of rules, that anybody (even a program) can check. They both value the relationship between `⊢` and `⊨` so that the rules for what you can do syntactically translate well into the semantics (Few programming languages actually boast a properly sound type system, though they do still value making the distinction as clear as possible).
 
-Where the proof system above is just there to enforce tautologies, type systems exist to enforce abstractions. Specifically to do so in a machine tractable way. What does that even mean? Well, first lets get back to propositions so we can talk about about Types themselves.
+Where the proof system above is just there to enforce tautologies, type systems exist to enforce abstractions. Specifically to do so in a machine tractable way. What does that even mean? 
+
+It sort of hard to go into detail without picking a specific type system, but we're going to pivit first. Lets get back to propositions so we can talk about about Types themselves.
 
 # What are Propositions in Propositional Logic?
 
@@ -227,72 +268,9 @@ let chair_height = 458; // millimetres
 let syntactically_legal_nonsense = chair_colour + chair_height;
 ```
 
-# The Naive View of Types in Computer Science
-
-> [A] computer is unable to discriminate between for example a memory address and an instruction code, or between a character, an integer, or a floating-point number, because it makes no intrinsic distinction between any of the possible values that a sequence of bits might *mean*
->
-> [...]
->
-> Assigning a data type, termed typing, gives *meaning* to a sequence of bits such as a value in memory
-> - [Wikipedia <sup>(link)</sup>](https://en.wikipedia.org/wiki/Type_system)
-
-Consider the following sequence of bits:
-
-```
-10000001
-```
-
-What could this sequence of bits represent as a value?
-
- - If that's an unsigned 8bit integer, then it could represent a `129`.
- - It also could represent any constant transformation of an 8bit integer:
-   - Absolute negative value: `-129`
-   - Thousands: `129,000`
-   - Even numbers: `258`
- - If that's a signed 8bit integer:
-   - It could represent a `-1`
-   - If it is in 2s complement then `-127`
- - If the bit that carries the sign isn't the standard one, there's a whole other set of numbers this could represent.
- - It could be an array of two unsigned 4bit integers: `[8,1]`
- - The value may not be an integer at all. Getting more outlandish, it might be a bit-map for items in an adventurer's backpack. In which case this might encode two specific key items (item-id `0` and `7`) out of eight key items an adventurer will need to find during their quest! 
- - This value could be a memory address on a **very** small embedded system, or perhaps the system pads this with zeros to interpret it as a memory address.
- - This could be a machine instruction code of some sort.
- - This could be a path through a binary tree.
- - The above considerations also depend on the "endianness" of the memory layout as well.
-
-You can see the problem. You cannot tell the type of this value by inspecting its bits. Giving those bits a type is the process by which we imbue them with meaning. It doesn't matter that assembly has no means to annotate types and no automated way to check them, any programmer using assembly must do that work manually — they can not reasonably choose to avoid it. For example: it's never desirable to multiply two memory addresses together, so an assembly programmer does their best to avoid doing so. Failing in this task isn't a type error within the language, but it is still a type error conceptually and will result in an incorrect program.
-
-Programmers need to reason about the types of the data they are working with in order to ensure that their programs are correct. 
-
-Here's the catch! Programs are themselves data whose 0s and 1s are imbued with meaning and which developers must be able to reason about.
-
-# Types are about Abstraction
-
-The naive view of types is that:
-
-> Assigning a data type, termed typing, gives *meaning* to a sequence of bits such as a value in memory.
-
-While that is a way to motivate the use of types, this is not typically how types act while programming. It also doesn't really line up with the earlier definition of types denoting nonempty sets of values. The main thing to remember about types, is that they are a tool for abstraction. The easiest way to understand this is to consider how often a developer even sees the sequence of bits that represent the values they use. Especially in the basic nominal cases, developers leave the bit-fiddling to low-level operations.
-
-In general, programmers consider even the most fundamental types to have an existential representation. A well behaved representation exists (because it must), but any other well behaved representation would do just as well. Many Java programmers have never checked (and it has never mattered) whether their {%emph(c="blue")%}int{%end%} is represented in 2's compliment or not. The type system forms an abstraction boundary so that so long as the API of an {%emph(c="blue")%}int{%end%} doesn't change, the representation is largely irrelevant <sup>[1]</sup>.
-
-Instead of "giving meaning" to a sequence of bits, types can be seen in some ways as the opposite. They describe a program that's provably generic over the representation, which means a Java Class doesn't describe a program, but instead a whole set of programs (at least one program for each possible representation of {%emph(c="blue")%}int{%end%}). It just so happens we pick binary representations that work well with our hardware.
-
-In some languages there are pragmatic reasons (say performance/memory) to care about the representation or some part of the representation. Because of its pedigree as a systems language, Rust has 12 different integer types, though they differ on whether they are signed (support negative integers) and how much memory they require, they don't differ on any other representational decisions such as which bit is the most significant, which bit is signed, or whether signed numbers are in two's complement. Even here, the types act to abstract exactly those choices developers want to stop caring about.
-
-{%aside()%}
-### You can probably skip this aside:
-
-<sup>[1]</sup> Okay, it's been pointed out to me that this is perhaps not the best example since logical and arithmetic shifts expose the representation of Java's `int`. You can have a well typed Java program where the equality of two expressions differs based on representation. I think this is just a semantic trap. If we tried to formalize what it means when I say "other well behaved representation would do just as well," it would be something like an isomorphism between representations and their given operations. A logical **binary** shift is not isomorphic to a logical **decimal** shift, but you can implement a logical binary shift on a decimal representation just fine. In Java, any of the math operations provided to the language are implemented somehow based on the type's representation, but this is opaque to the language itself.
-
-The `integer` type found in a proof assistant (like *Lean*) would be much more resilient against such concerns than Java's `int`. In a proof assistant `integer` and its operations are defined within the language and not handed over. Setting aside verbosity/performance, this shows it's possible to do better. At the end of the day, however, type systems have hard choices to make around the halting problem or concerns such as hardware crashing during a process. While many type-level abstractions are not, I suspect there will always be some type-level abstractions that are leaky (You can "see through" the abstraction if you know how to mess with the edges just right).
-
-This is a whole can of worms and there's more to say on this topic. Let's leave that for another time.
-{%end%}
-
 # A More Nuanced View on Types
 
-To develop a nuanced view of what types you need to understand them in the context of how and why they're used. What motivates the use of types? When we look at the ways in which they're used in older imperative programming languages, a simple answer might be "so that the compiler can calculate how much memory some data takes and how to represent (persist) the data in memory so that I don't have to do it myself". To support this line of reasoning, these languages always give you a way to build more complex types from simpler types. Lets run with an example, most languages allow you to define a new product type called a pair from any other two types: `∀ A:type B:type | (A, B):type`. This reads "The pairing of any two types is itself a type". A use for this is that the compiler can understand how a type can be represented based on its construction. How a pair is persisted in memory depends on the types in question, but you can describe what to do generically. For each way you can build up more complex types (like `∀ A:type | [A]:type`, or `∀ A:type | Vec<A>:type`), you can equip the compiler with rules that let it understand what to do. So the compilor contains something like function from types to memory layout, but just like you can create new proposition using the logical connectives, you can create new types using some given connectives.
+To develop a nuanced view of what types you need to understand them in the context of how and why they're used. What motivates the use of types? When we look at the ways in which they're used in older imperative programming languages, a simple answer might be "so that the compiler can calculate how much memory some data takes and how to represent (persist) the data in memory so that I don't have to do it myself". To support this line of reasoning, these languages always give you a way to build more complex types from simpler types. Lets run with an example, most languages allow you to define a new product type called a pair from any other two types: `∀ A:type B:type | (A, B):type`. This reads "The pairing of any two types is itself a type". A use for this is that the compiler can understand how a type can be represented based on its construction. How a pair is persisted in memory depends on the types in question, but you can describe what to do generically. For each way you can build up more complex types (like `∀ A:type | [A]:type`, or `∀ A:type | Vec<A>:type`), you can equip the compiler with rules that let it understand what to do. So the compilor contains something akin to a function from types to memory layout, but just like you can create new proposition using the logical connectives, you can create new types using some given connectives.
 
 It turns out that we want the rules for how to persist a type in memory to have some predictable mathimatical structure. Like if we want to let the compilor optimise memory layouts, we need to feed it rules for how types can be re-written. Why should we allow the following re-write:
 
