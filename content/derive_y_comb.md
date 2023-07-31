@@ -298,9 +298,9 @@ mock = lambda f: lambda *a, **kw: f(f, *a, **kw)
 r = lambda f, n: 1 if n==0 else n * f(f, n-1)
 
 mock(             r      )(5)\
-==                           \
+    ==                       \
 mock(lambda f, n: r(f, n))(5)\
-==                           \
+    ==                       \
 120
 ```
 ```Output
