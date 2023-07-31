@@ -91,9 +91,9 @@ So if `factorial` isn’t in the global scope, maybe we can pass it in somehow i
 (lambda f, n: 1 if n==0 else n * f(n-1))(????????, 5)
 ```
 
-So now we have an anonymous function, but it takes a parameter that we're not sure how to fulfill. This next bit is admittedly a bit of a leap. What goes where the `????????` is sitting above? We want to pass in the function itself? Can we do that?
+So now we have an anonymous function, but it takes a parameter that we're not sure how to fulfill. This next bit is admittedly a bit of a leap. What goes where the `????????` is sitting above? Since it's a recursive call, the function we want is the same function itself! Can we do that?
 
-`f` is our stand-in for the recursive call. In that capacity we want `f` to be the very thing we're currently defining. If we could use names we might try something like this:
+If we could use names we might try something like this:
 
 ```Python
 r = lambda f, n: 1 if n==0 else n * f(n-1)
@@ -408,5 +408,5 @@ Y = λf.(λx.f(xx))(λx.f(xx))
 # force lazy execution. So this is a bit closer to the fix function we
 # derived in this article (Think of z like "*a, **kw")
 Z = λf.(λx.f(λz.xxz))(λx.f(λz.xxz))
-  = λf.(λxz.xxz)     (λx.f(λz.xxz))
+  = λf.(  λxz.xxz   )(λx.f(λz.xxz))
 ```
