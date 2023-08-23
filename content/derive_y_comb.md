@@ -80,7 +80,7 @@ NameError: name 'factorial' is not defined
 
 Of course, this doesn't work. Since `factorial` referred to itself, removing the name messes with the internals of the implementaiton. So this is the first puzzle: can we define factorial using this simple recursive definition without relying on a global namespace where factorial is already defined?
 
-What we **can** try to do rely on a common programming trick. If you're ever in a position where you've removed some global value (as is sometimes good coding practise), but you want to keep a function that depends on that value, you can pass that value into the function as a parameter instead.
+What we **can** do is try relying on a common programming trick. If you're ever in a position where you've removed some global value (as is sometimes good coding practise), but you want to keep a function that depends on that value, you can pass that value into the function as a parameter instead.
 
 ```Python
 USER_PREFIX = "User:"
@@ -288,7 +288,7 @@ It's also a rule that should seem a bit suspicious. The first rule is what lets 
 
 Really, as a point of pride, we want this step gone. The puzzle here is: how?
 
-Consider the following where we want to pass in `mock(f)` instead of `f`
+Consider the following: `mock(f)(n-1)` is extensionally equal to `f(f, n-1)`.
 
 ```Python
 mock(
@@ -299,7 +299,9 @@ mock(
 120
 ```
 
-Well, we can use the same trick where we wrap the input and return a modified version. Let's take this idea and expand it out for factorial to see it at work. Here we add in a wrapper around `r` that doesn't do anything yet:
+Given that this works, the recursive expression for `factorial` doesn't call `f` directly anymore. If we could give the expression `mock(f)` in place of `f`, then we can drop the requirement that `f` needs to call itself as the first arguement.
+
+We can use the same trick where we wrap the input and return a modified version. First, lets create a wrapper around `r` that doesn't do anything yet:
 
 ```Python
 mock = lambda f: lambda *a, **kw: f(f, *a, **kw)
@@ -315,6 +317,8 @@ mock(lambda f, n: r(f, n))(5)\
 True
 ```
 
+Next, we add a modification to our wrapper:
+ 
 Of course a wrapper that does nothing isn't useful, but we can modify this slightly by altering the wrapper's `f` {%emph()%}before{%end%} passing it to our recursive inner function. Which will mean that factorial will no longer need to perform that step for itself.
 
 ```Python
