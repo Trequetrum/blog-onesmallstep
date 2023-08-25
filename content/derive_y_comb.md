@@ -16,15 +16,15 @@ keywords = "Syntax, Semantics, Logic, Math, Foundation, Programming, Language, L
 
 Why would you want to know how to derive the Y-Combinator? Well, mostly for interest's own sake. Modern languages all ship with built-in constructs for recursion. It's not likely you'll ever be required to do something like this.
 
-Curry's presentation of the fixed-point combinator for λ-Calculus (sometime in the late 1930's, I can't find a concrete source) is one of a select few of those early cornerstone results that then went on to shape the world of computing. It's a common misconception that electrical computers begat — or at least motivated — study into computation, complexity analysis, universal decidability, and so on. There's a storied history of logicians delving into these topic long before anyone imagined we would be teaching silicon how to think.
+Curry's presentation of the fixed-point combinator for λ-Calculus (sometime in the late 1930's, I can't find a concrete source) is one of a select few of those early cornerstone results that then went on to shape the world of computing. It's a common misconception that electrical computers begat — or at least motivated — study into computation, complexity analysis, universal decidability, and so on. There's a storied history of logicians delving into these topics long before anyone imagined we would be teaching silicon how to think.
 
-Curry's Y-combinator is both a very elegant formal definition of recursion, and an entrypoint into understanding why developing bug-proof software is systemically difficult.
+Curry's Y-Combinator is both a very elegant formal definition of recursion, and an entry point into understanding why developing bug-proof software is systemically difficult.
 
 # Prelude
 
-This blog entry roughly follows an imaginary sequence of thoughts that one could potentially have; the net result of which would be discovering something very much like the Y-combinator — a variadic extension, perhpas? It's not that important what we call it. We'll jump right in with Python. We're going to start with a very simple function and a contrived restriction, then keep taking little steps to abstract a bit at a time.
+This blog entry roughly follows an imaginary sequence of thoughts that one could potentially have; the net result of which would be discovering something very much like the Y-Combinator — a variadic extension, perhaps? It's not that important what we call it. We'll jump right in with Python. We're going to start with a very simple function and a contrived restriction, then keep taking little steps to abstract a bit at a time.
 
-What we're about to do is feed some of the ideas from λ-calc into a simple python program. I don't beleive writting Python as λ-calc is a either a recipe for success or a very pythonic thing to do. We're treating Python more as a means to actively play around with pseudocode than any attempt to be abidingly Pythonic. Python’s dynamic nature and relatively unobtrusive syntax make it a good language to use for this. In the off chance you want to copy some of the code and play around with it until it makes sense, this should be a fairly straight forward task.
+What we're about to do is feed some of the ideas from λ-calc into a simple python program. I don't believe writing Python as λ-calc is a either a recipe for success or a very pythonic thing to do. We're treating Python more as a means to actively play around with pseudo-code than any attempt to be abidingly Pythonic. Python’s dynamic nature and relatively unobtrusive syntax make it a good language to use for this. In the off chance you want to copy some of the code and play around with it until it makes sense, this should be a fairly straight forward task.
 
 I also think Python's runtime semantics are intuitive to a lot of programmers. So let’s jump in!
 
@@ -32,7 +32,7 @@ I also think Python's runtime semantics are intuitive to a lot of programmers. S
 
 Our first step here is going to be to try to puzzle out how to write an anonymous recursive function. 
 
-Without recursion, this task is generally quite simple. Here is a function named `double`, to apply some value to the function we first reference it by name and apply a value.
+Without recursion, this task is generally quite simple. Here is a function named `double`, to apply some value to the function we first reference it by name and apply a value (Instead of a standard Python function `def`, I’ve assigned a lambda expression to a variable. It just makes the transformation into an anonymous function very simple).
 
 ```Python
 double = lambda n: n + n
@@ -51,11 +51,11 @@ Of course, if I want to define the same function without naming it, I can do so.
 10
 ```
 
-Why restrict ourselves to anonymous functions? Well, nearly every example of recursion you'll see performs the self-referencing step by name. By untangling this single restriction we can both arrive at a deeper understanding of recursion and derive the Y-combinator. Rather neat, no?
+Why restrict ourselves to anonymous functions? Well, nearly every example of recursion you'll see performs the self-referencing step by name. By untangling this single restriction we can both arrive at a deeper understanding of recursion and derive the Y-Combinator. Rather neat, no?
 
-There is a lot of content out there that starts by introducing λ-calc basics and going from there. I chose this sort of sideways appraoch because as far as I know it is a relatively novel way of understanding this cool bit of computing history.
+There is a lot of content out there that starts by introducing λ-calc basics and going from there. I chose this sort of sideways approach because as far as I know it is a relatively novel way of understanding this cool bit of computing history.
 
-As a formal definition of recurison λ-calculus' Fix-Point Combinator doesn’t much care about how other mathematical objects like numbers or propositions are represented. I think we can get a reasonable distance toward understanding a version of the Fix-Point Combinator via the semantics of Python without worrying about  λ-terms, how variables are introduced, what makes a legal α-conversion or β-reduction, etc. I contend we don’t need any of that for what's described here.
+As a formal definition of recursion λ-calc's Fix-Point Combinator doesn’t much care about how other mathematical objects like numbers or propositions are represented. I think we can get a reasonable distance toward understanding a version of the Fix-Point Combinator via the semantics of Python without worrying about  λ-terms, how variables are introduced, what makes a legal α-conversion or β-reduction, etc. I contend we don’t need any of that for what's described here.
 
 What we do need, however, is the single restriction that stops us from using Python's built in call-site resolution to perform recursion on our behalf. Once we've shown that it can be done, we'll start using names again to keep the code going forward a little cleaner and easy to understand.
 
@@ -78,7 +78,9 @@ Assuming `factorial` is just like `double`, we could just try dropping the name 
 NameError: name 'factorial' is not defined
 ```
 
-Of course, this doesn't work. Since `factorial` referred to itself, removing the name messes with the internals of the implementaiton. So this is the first puzzle: can we define factorial using this simple recursive definition without relying on a global namespace where factorial is already defined?
+Of course, this doesn't work. Since `factorial` referred to itself, removing the name messes with the internals of the implementation. So this is the first puzzle: how can we define factorial using this simple recursive definition without relying on some external state where factorial is already defined?
+
+If you’re like me, thinking this through should break your brain a little bit. Understanding the relationship between recursion and looping is a bit more intuitive. If you write a stack to push and pop some state, you can re-write anything recursive as a loop. If you don’t have any loops and you don’t have any built-in recursion, how can you do recursion by just passing functions around?
 
 What we **can** do is try relying on a common programming trick. If you're ever in a position where you've removed some global value (as is sometimes good coding practise), but you want to keep a function that depends on that value, you can pass that value into the function as a parameter instead.
 
@@ -101,7 +103,7 @@ So if `factorial` isn’t in the global scope, maybe we can pass it in somehow i
 (lambda f, n: 1 if n==0 else n * f(n-1))(????????, 5)
 ```
 
-So now we have an anonymous function, but it takes a parameter that we're not sure how to fulfill. This next bit is admittedly a bit of a leap. What goes where the `????????` is sitting above? Since it's a recursive call, the function we want is the same function itself! Can we do that?
+So now we have an anonymous function, but it takes a parameter that we're not sure how to fulfill. This next bit is admittedly a bit of a leap. Let’s think through what goes where the `????????` is sitting above. Remember that this is a recursive call, we want to pass in the same function that we’re calling! Can we do that?
 
 If we could use names we might try something like this:
 
@@ -128,7 +130,7 @@ That seems to work. If you can mess around with the code so far and figure out w
 
 Of course we've named `r` here which wasn't supposed to be allowed. 
 
-However, we're now in a better place than we were before because `r` doesn't depend on itself explicitly. This means the inlining trick we used with `double` will work with `r`. We just need to copy the definition of `r` twice.
+However, we're now in a better place than we were before because `r` doesn't depend on itself explicitly. This means the in-lining trick we used with `double` will work with `r`. We just need to copy the definition of `r` twice.
 
 ```Python
 # 1. r = lambda f, n: 1 if n==0 else n * f(f, n-1)
@@ -142,6 +144,19 @@ However, we're now in a better place than we were before because `r` doesn't dep
 
 It's a bit of an eye-sore, but it works! We're going to keep going with `r` for now, but just remember we can expand `r` as shown above.
 
+The parametrization above doesn’t require self-reference, just a function with the same behaviour. For example:
+
+```Python
+r1 = lambda f, n: 1 if n==0 else n * f(f, n-1)
+r2 = lambda f, n: n * f(f, n-1) if n!=0 else 1
+r1(r2,5)
+```
+```Output
+120
+```
+
+If you trace what’s happening here, `r1` is actually only called the once. `r2` is then called n-1 times until an answer is found. In a way, `r1`’s primary purpose here is to bootstrap `r2`. The part of `r1` that does the bootstrapping is this: `f(f, n-1)`. You can see how it’s calling `f` with itself, which we know ends up being `r2` with itself. What if `r1` doesn’t do any of the rest and **just** acts to bootstrap `r2`? Something like `r1 = lambda f, n: f(f,n)` should work? Well yes, but there’s another way to understand this.
+
 # Factorial, auto-doubling
 
 When we look at where we've come so far, we have an anonymous function and it works but it's rather annoying to always need to pass in a second identical version of the function each time we want to call it. Instead, we'd like to have a function where we can just pass it a number and get the factorial of that number back as a result.
@@ -150,15 +165,16 @@ This is pretty easy, as it turns out. We'll parameterize the `5` in the snippet 
 
 ```Python
 r = lambda f, n: 1 if n==0 else n * f(f, n-1)
+# r(r,5) <-- pull out the 5 as a param ‘n’ for a new function
 (lambda n: r(r,n))(5)
 ```
 ```Output
 120
 ```
 
-So now we can call this in-line with a simple number and the function calls itself with the correct parameters and we're off to the races again.
+So now we have an anonymous function can call this in-line with only a number and it will evaluate to the factorial of that number. The function calls `r` with the correct parameters and we're off to the races again.
 
-We've come to the point where we've accomplished the first task that we set out to accomplish. We've created an anonymous version of `factorial`. We can call it a few times with different values and compare it against the standard non-anonymous version just to convince ourselves this really works.
+We've accomplished the first task that we set out to accomplish. We've created an anonymous version of `factorial`. We can call it a few times with different values and compare it against the standard non-anonymous version just to convince ourselves this really works.
 
 ```Python
 # Recursive starting function
@@ -193,9 +209,9 @@ r = lambda f, a, b: a if b % a == 0 else f(f, b % a, a)
 14
 ```
 
-This wrapper function isn't really doing anything special, so instead of a wrapper for `factorial` and another wrapper for `gcd`. We can generate wrappers automatically for any similar recursive function expression. 
+This wrapper function isn't really doing anything special, all it does is create a new function that's lacking the first parameter of the wrapped function and then calls the wrapped function properly. The only things that change from wrapper to wrapper is how many parameters there are and which function is being wrapped. Instead of a wrapper for `factorial` and another wrapper for `gcd`. We can generate wrappers automatically for any similar recursive function expression. 
 
-First, lets describe what it means to be a "*similar recursive function expression*". There are two criteria.
+First, lets describe what it means to be a "*similar recursive function expression*". There are two criteria:
 
 1. You must take the recursive call of the function as the first parameter.
 2. You must pass forward the first parameter as the first parameter again on any recursive calls.
@@ -216,7 +232,7 @@ def any_name(f, *any_other_args):
 
 We're going to write a function `mock` (as a reference to the *"To Mock a Mockingbird"* puzzle book) that generates these wrappers automatically for us. This is a fairly common pattern in computer science. You might hear terms like Adapter, Decorator, or Proxy used in the Object Oriented software dev world. At its simplest, you take some functionality as input and return some functionality that wraps the input with some extra behaviour.
 
-Consider `no_op_wrapper` below. It returns a new function that acts the same as the given function but is just one level deepeer in the generated call-stack. There's a level of indirection but no change in behaviour.
+Consider `no_op_wrapper` below. It returns a new function that acts the same (extensionally equal) as the given function. There's a level of indirection but no change in behaviour.
 
 ```Python
 def no_op_wrapper(f): 
@@ -247,7 +263,7 @@ You can write this a bit more concisely using Python's lambda expressions:
 mock = lambda f: lambda *a, **kw: f(f, *a, **kw)
 ```
 
-This lets us do the recursive wrapping trick for any function written in this form.
+This lets us do the recursive wrapping trick for any recursive function expression as discussed above. Lets try it with `factorial` and `gcd`:
 
 ```Python
 mock( # Factorial
@@ -270,7 +286,7 @@ We got the right answers, so `mock` seems to be working for us.
 
 # Pre-applied Recursion
 
-In every one of our anonymous recursive form of functions, the second requirement is that we're always going to need to call `f` with itself:
+In every one of our recursive function expressions, the second requirement is that we're always going to need to call `f` with itself:
 
 ```Python
 # Factorial
@@ -284,7 +300,7 @@ lambda f, a, b: a if b % a == 0 else f(f, b % a, a)
 
 This is a small, but repetitive step. Its possible to get this step wrong and create some pretty bizarre control flow. 
 
-It's also a rule that should seem a bit suspicious. The first rule is what lets us create a recursive call, but the second rule is just an extra bit of bookkeeping. We should think about whether this is accidental or essential complexity. Consider that we've already created a function called `mock` that removes our need to call `r` with itself. There doesn't seem to be any reason (in principle) why we could't use `mock` to call `f` with itself too.
+It's also a rule that should seem a bit suspicious. The first rule parametrizes `f` and is what lets us create a recursive call. The second rule is just an extra bit of bookkeeping. It just re-aligns the API to this new form of a function that takes itself as a first parameter. We should think about whether this is accidental or essential complexity. Consider that we've already created a function called `mock` that removes our need to call `r` with itself. There doesn't seem to be any reason (in principle) why we couldn't use `mock` to call `f` with itself too.
 
 Really, as a point of pride, we want this step gone. The puzzle here is: how?
 
@@ -299,9 +315,9 @@ mock(
 120
 ```
 
-Given that this works, the recursive expression for `factorial` doesn't call `f` directly anymore. If we could give the expression `mock(f)` in place of `f`, then we can drop the requirement that `f` needs to call itself as the first arguement.
+Given that this works, the recursive expression for `factorial` doesn't call `f` directly anymore. If we could give the expression `mock(f)` in place of `f`, then we can drop the requirement that `f` needs to call itself as the first argument.
 
-We can use the same trick where we wrap the input and return a modified version. First, lets create a wrapper around `r` that doesn't do anything yet:
+We can use the same trick where we wrap the input and return a modified version. First, lets create a wrapper around our recursive expression `r` that doesn't do anything yet:
 
 ```Python
 mock = lambda f: lambda *a, **kw: f(f, *a, **kw)
@@ -319,7 +335,7 @@ True
 
 Next, we add a modification to our wrapper:
  
-Of course a wrapper that does nothing isn't useful, but we can modify this slightly by altering the wrapper's `f` {%emph()%}before{%end%} passing it to our recursive inner function. Which will mean that factorial will no longer need to perform that step for itself.
+Of course a wrapper that does nothing isn't useful, but we can modify this slightly by altering the wrapper's `f` {%emph()%}before{%end%} passing it to our recursive inner function. Which will mean that factorial will no longer need to perform that step for itself. Instead of calling `mock(f)` as part of the implementation of `r`, we call `mock(f)` before calling `r`.
 
 ```Python
 mock = lambda f: lambda *a, **kw: f(f, *a, **kw)
@@ -334,22 +350,21 @@ mock(lambda f, n: r(mock(f), n))(5)
 
 In doing this, we've crested the hill. 
 
-The expression we're wrapping no longer requires `f` to pass itself forward on each subsequent call. The rest of the work should more or less be standard stuff to clean up the work we've done so that instead of working for just the given recursive expression, we can create a function that will work for **any** similar recursive expression.
+The expression we're wrapping no longer requires `f` to pass itself forward on each subsequent call. We're now in a similar position as before we wrote `mock`. We need to create this custom wrapper around `r` where we call `mock(f)`. The solution is the same as well. We'll create a new function called `fix` that wraps our new type of recursive function expression.
 
-Lets update the rules for what you must do to be a similar recursive expression
+Here are the updated rules for our recursive function expressions:
 
 1. You must take the recursive call of the function as the first parameter.
 2. ~~You must pass forward the first parameter as the first parameter again on any recursive calls.~~
 
 That feels nice.
 
-Let's parameterize `r` by creating a function that takes in a function like `r` and does all the recursive work we've just figured out. Remember that while the `r` above just takes a parameter n, we don't make that assumption when we parametrize. Instead we'll replace `n` with any {%emph()%}args{%end%} or {%emph()%}kwargs{%end%}
+Here's what `fix` looks like.
 
 ```Python
 mock = lambda f: lambda *a, **kw: f(f, *a, **kw)
 
-def fix(r):
-    return mock(lambda f, *a, **kw: r(mock(f), *a, **kw))
+fix = lambda r: mock(lambda f, *a, **kw: r(mock(f), *a, **kw))
 ```
 
 Lets try it out!
@@ -391,19 +406,19 @@ So, if the steps we took along the way didn’t throw you for a loop, you can no
 
 # Appendix
 
-Let's take our definitions, drop the `*a` and `**kw` stuff and see what it looks like. In λ-calc, doing this is akin to something called an {%emph()%}η-reduction{%end%}. In Python, this reduction isn't as straight forward. So while the code below is Python-like, don't take it too seriously. We play a bit fast a loose with the syntax here so that if you see this stuff in the wild, you may recognise it.
+Let's take our definitions, drop the `*a` and `**kw` stuff and see what it looks like. In λ-calc, doing this is very loosly akin to something called an {%emph()%}η-reduction{%end%}. In Python, this reduction isn't as straight forward. So while the code below is Python-like, don't take it too seriously. We play a bit fast a loose with the syntax here so that if you see this stuff in the wild, you may recognize it.
 
-This is really the least important part of the article :)
+This really is the least important part of the article :)
 
 ```Python
 mock = lambda f: lambda *a, **kw: f(f, *a, **kw)
-# η-reduction (Drop extra arguements that are just passed through)
+# η-reduction (Drop extra arguments that are just passed through)
 mock = lambda f: f(f)
 # α-conversion (Rename variables)
 M = lambda x: x(x)
 
 fix = lambda r: M(lambda f, *a, **kw: r(M(f), *a, **kw))
-# η-reduction (Drop extra arguements)
+# η-reduction (Drop extra arguments)
 fix = lambda r: M(lambda f: r(M(f)))
 # expand the first and second M
 fix = lambda r: (lambda x: x(x))(lambda f: r(((lambda x: x(x)))(f)))
