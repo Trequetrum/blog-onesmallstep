@@ -14,11 +14,11 @@ keywords = "Syntax, Semantics, Logic, Math, Foundation, Programming, Language, L
 
 # Preface
 
-Why would you want to know how to derive the Y-Combinator? Well, mostly for interest's own sake. Modern languages all ship with built-in constructs for recursion. It's not likely you'll ever be required to do something like this.
+Why would you want to know how to derive the Y-Combinator? Well, mostly for interest's own sake.
 
-Curry's presentation of the fixed-point combinator for λ-Calculus (sometime in the late 1930's, I can't find a concrete source) is one of a select few of those early cornerstone results that then went on to shape the world of computing. It's a common misconception that electrical computers begat — or at least motivated — study into computation, complexity analysis, universal decidability, and so on. There's a storied history of logicians delving into these topics long before anyone imagined we would be teaching silicon how to think.
-
-Curry's Y-Combinator is both a very elegant formal definition of recursion, and an entry point into understanding why developing bug-proof software is systemically difficult.
+1. **History:** It's a common misconception that electrical computers begat — or at least motivated — study into computation, complexity analysis, universal decidability, and so on. There's a storied history of logicians delving into these topics long before anyone imagined we would be teaching silicon how to think. Curry's presentation of the fixed-point combinator for λ-Calculus (sometime in the late 1930's, I can't find a concrete source) is one of many early cornerstone results that then went on to shape the world of computing.
+2. **Curry’s Paradox:** This famous paradox shows where logic fails to model some basic properties of speech and mathematics. The Y-Combinator may be used used to surface this paradox in computational systems. Its close relation with other well known topics like the Liar's paradox, decidability, and Gödel's incompleteness theorems makes this a fun brain teaser to interact with and poses serious challenges to researches involved in the work of trying to formalize or understand the systems being modelled. On top of the emergent complexity inherent to the millions of interacting parts of a large software system, writing bug-proof software is systemically difficult too.
+3. **Recursion:** Curry's Y-Combinator is an elegant formal definition of recursion. Describing the semantics of a function call is made more complex if your language allows recursion. While the process is tedious, function calls can generally be described as an equivalent flat sequence of steps (for example; where you assign some variables and copy the body), so you can easily preserve the meaning of a program with functions within a language that doesn't have them. In the face of recursion this simple idea doesn't terminate, so you need some mechanism that lets you reify functions.
 
 # Prelude
 
