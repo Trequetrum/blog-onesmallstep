@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <script src="https://trequetrum.github.io/blog-onesmallstep/theme.min.js" integrity="sha384-IpIaa84kOKgkF5EJ0fD/kBe2wtIIsIB60ANGmuJxeA0dz5bSRfwBwp2/QybtQpU2"></script>
+  <link rel="stylesheet" href="https://trequetrum.github.io/blog-onesmallstep/abridge-switcher.css?h=48c4ccc424d544f703dd" />
+  <link rel="stylesheet" href="https://trequetrum.github.io/blog-onesmallstep/extra-styles.css?h=74f82ec9e1007752c4a6" />
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="preload" as="style" class="preStyle" href="https://trequetrum.github.io/blog-onesmallstep/katex.min.css" integrity="sha384-ZPe7yZ91iWxYumsBEOn7ieg8q/o+qh/hQpSaPow8T6BwALcXSCS6C6fSRPIAnTQs" />
+  <script defer src="https://trequetrum.github.io/blog-onesmallstep/search_index.en.js?h=24b4cf78626c8144ae60" integrity="sha384-+jHivRw49IuGzPJF8I4a2WoBsAoormvIgj4QtUx2vi8b0TM2aKNMoaT8PKfYJ8HG"></script>
+  <script defer src="https://trequetrum.github.io/blog-onesmallstep/abridge-bundle-nofacade.min.js?h=9bcf621a2fcab7336017" integrity="sha384-u8AROOUG6n2Xjk2+7pvkkfeSIqinjI1tmqeBpZRlZtc5KFO/8DyFfEir6fAE2wcq"></script>
+  <script defer src="https://trequetrum.github.io/blog-onesmallstep/katexbundle.min.js?h=a550ba0540c37778ffcb" integrity="sha384-ddSpLWE2IN4NTX956m9zVX0cUonZmEeunMpVZPgEcwmGficsSB8WtHlbuWkGPf8d"></script>
+  <meta name="base" content="https://trequetrum.github.io/blog-onesmallstep" />
+  <link rel="alternate" type="application/atom+xml" title="Atom/RSS Feed" href="https://trequetrum.github.io/blog-onesmallstep/atom.xml" />
+  <meta name="robots" content="index, follow" />
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <title>An RxJS Stopwatch Implementation | One Small Step</title>
+  <meta name="author" content="Mark" />
+  <meta name="copyright" content="One Small Step" />
+  <meta name="description" content="Now let it work. Mischief, thou art afoot, Take thou what course thou wilt!" />
+  <link rel="canonical" href="https://trequetrum.github.io/blog-onesmallstep/rxjs-stopwatch/" />
+  <meta name="keywords" content="TypeScript, RxJS, Programming, Blog, Tech, Programming, Personal, Philosophy" />
+  <meta property="og:url" content="https://trequetrum.github.io/blog-onesmallstep/rxjs-stopwatch/" />
+  <meta name="twitter:url" content="https://trequetrum.github.io/blog-onesmallstep/rxjs-stopwatch/" />
+  <meta property="og:description" content="Now let it work. Mischief, thou art afoot, Take thou what course thou wilt!" />
+  <meta name="twitter:description" content="Now let it work. Mischief, thou art afoot, Take thou what course thou wilt!" />
+  <meta property="og:title" content="An RxJS Stopwatch Implementation | One Small Step" />
+  <meta name="twitter:title" content="An RxJS Stopwatch Implementation | One Small Step" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://trequetrum.github.io/blog-onesmallstep/banner.png" />
+  <meta property="og:image" content="https://trequetrum.github.io/blog-onesmallstep/banner.png" />
+  <meta property="og:site_name" content="One Small Step" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:type" content="website" />
+  <meta property="og:updated_time" content="2023-04-13" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#333333" />
+  <meta name="msapplication-TileColor" content="#333333" />
+  <link rel="manifest" href="https://trequetrum.github.io/blog-onesmallstep/site.webmanifest" />
+  <link rel="mask-icon" href="https://trequetrum.github.io/blog-onesmallstep/safari-pinned-tab.svg" color="#ff9900" />
+  <link rel="apple-touch-icon" sizes="180x180" href="https://trequetrum.github.io/blog-onesmallstep/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="https://trequetrum.github.io/blog-onesmallstep/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="https://trequetrum.github.io/blog-onesmallstep/favicon-16x16.png" />
+  <noscript><link rel="stylesheet" href="https://trequetrum.github.io/blog-onesmallstep/nojs.css" /></noscript>
+</head>
+<body>
+  <header>
+    <nav>
+      <div><h1><a href="https://trequetrum.github.io/blog-onesmallstep/"><img src="https://trequetrum.github.io/blog-onesmallstep/brackets_logo.png" alt="One" width="32" height="32" /> Small Step</a></h1></div>
+      <div>
+        <ul><li> <h2><a href="https://trequetrum.github.io/blog-onesmallstep/about/">About</a></h2> </li><li> <h2><a href="https://trequetrum.github.io/blog-onesmallstep/posts/">Posts</a></h2> </li><li> <h2><a href="https://trequetrum.github.io/blog-onesmallstep/categories/">Categories</a></h2> </li><li> <h2><a href="https://trequetrum.github.io/blog-onesmallstep/tags/">Tags</a></h2> </li><li class="js"><i type="reset" id="mode" class="svgs adjust"></i></li></ul>
+      </div>
+      <div>
+        <form autocomplete=off class="js" name="goSearch" id="searchbox">
+          <div class="searchd">
+            <input id="searchinput" type="text" placeholder="Search" title="Search" />
+            <button type="submit" title="Search"><i class="svgs search"></i></button>
+          </div>
+          <div><div id="suggestions"></div></div>
+        </form>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <article>
+        <h1><a href="https://trequetrum.github.io/blog-onesmallstep/rxjs-stopwatch/">An RxJS Stopwatch Implementation</a></h1>
+        <span class="s95"> Mark<span class="hpad"> </span> April 13, 2023<span class="hpad"> </span> [<a href="https://trequetrum.github.io/blog-onesmallstep/categories/code/">Code</a>] #<a href="https://trequetrum.github.io/blog-onesmallstep/tags/typescript/">TypeScript</a>  #<a href="https://trequetrum.github.io/blog-onesmallstep/tags/rxjs/">RxJS</a> </span>
+
+    <h1 id="stopwatch">Stopwatch</h1>
+<h3 id="preamble">Preamble:</h3>
+<p>Back in the spring of 2020, I ran face first into the stack overflow equivalent to the Baader-Meinhof Phenomenon. I answered a stack overflow question about creating a stopwatch using RxJS and found myself referring back to variations on that exact question every few weeks throughout the summer. I'm putting it here now because it seems intuitively like a task that a streaming library should be able to handle easily. I have never found an answer that clicked for me. Perhaps somebody else will discover or point me at a clever solution that I hadn't considered.</p>
+<p>I think RxJS streams push-based nature make them a poor fit for the problem. </p>
+<p>I'm also including it because I think it has some pedagogical merit for a beginner looking to sharpen their skills a bit.</p>
+<ul>
+<li>It uses <code>defer</code> to capture state in a closure
+<ul>
+<li>Each subscription creates it's own local state</li>
+<li>Operators like <code>retry</code> behave as expected</li>
+</ul>
+</li>
+<li>It uses <code>scan</code> to incrementally build data
+<ul>
+<li><code>reduce</code>, <code>scan</code>, and <code>expand</code> are friendly operators that are often overlooked</li>
+</ul>
+</li>
+<li>It uses a higher order operator — <code>switchMap</code> — to manage observable lifetimes
+<ul>
+<li>Mastering <code>mergeMap</code>, <code>switchMap</code>, <code>concatMap</code>, and <code>ExhaustMap</code> is nessesary to be proficent with Reactive Extensions</li>
+</ul>
+</li>
+<li>It builds a custom RxJS Operator
+<ul>
+<li>Understanding how to create an <code>OperatorFunction</code> generally means heading toward an understanding a whole host of interesting concepts that RxJS uses liberally. These include currying, function composition, reducers (aka: fold, accumulate), and finally transducers (composable higher-order reducers).</li>
+</ul>
+</li>
+</ul>
+<h3 id="the-problem">The Problem</h3>
+<p>The crux of the problem is this: </p>
+<ul>
+<li>Our input is a stream that emits a series of <span class=blue-emph>&quot;RUN/PAUSE&quot;</span> or <span class=blue-emph>&quot;RESET&quot;</span> actions over an arbitrary span of time.</li>
+<li>If the input stream <code>error</code>s or <code>complete</code>s, then so should the output. 
+<ul>
+<li>Once the output is done, all memory should be released to the GC — for example, there should be no ongoing timers.</li>
+</ul>
+</li>
+<li>The watch has two states:
+<ul>
+<li><span class=pink-emph>Running</span>: The output should emit a number every <code>interval</code> milliseconds.</li>
+<li><span class=pink-emph>Paused</span>: There should be no output.</li>
+</ul>
+</li>
+<li>The watch starts <span class=pink-emph>Paused</span> and switches state each time the source emits <span class=blue-emph>&quot;RUN/PAUSE&quot;</span></li>
+<li>The Output's emissions are numbers:
+<ul>
+<li>The first number to be emitted is a zero</li>
+<li>If the source emits <span class=blue-emph>&quot;RESET&quot;</span>, the next number emitted is a zero</li>
+<li>Otherwise, the emitted number is always the previous emitted number + 1.</li>
+</ul>
+</li>
+</ul>
+<p>The most accurate solutions just use the system time. Doing so can avoid the sharp corners of the JS event loop. I think that for the sake of just learning and using RxJS, those concerns add incidental complexity. To that end, there's a relatively succinct solution you can implement by recursively calling <code>setTimeout</code>. For a third party auditing such code, understanding the mix of callbacks, <code>setTimeout()</code>, <code>clearTimeout()</code>, timestamp calculations and so on would not be trivial. We're hoping RxJS can modularize the logic such that a reader familiar with the library could reasonably understand it on a first or second reading. There shouldn't be too much logic that needs to be understood in the context of the broader solution, so that if you understand each part you naturally come to an understanding of the whole.</p>
+<h3 id="a-solution">A Solution</h3>
+<p>Here is a solution which leans on RxJS' switchMap operator to manage an internal stopwatch timer. We also use scan to track the watches current state for us. In general, the solution is short enough that it's pretty straight forward.</p>
+<p>What I don't like abotu this solution is how <code>count</code> is managed. It breaks up an otherwise very modularized solution. The value is initialized, incremented, and reset to zero all on disparate lines of code. The only way to understand what is happening with this value is to understand the entire solution. Which is a shame because everything else can be understood a few lines at a time. It's a fairly contained little piece of state and it seems like the natural way to manage this. On the other hand, <code>defer</code> adds a bunch of clutter and exists only to add in a little bit of state. It simply feels like there should be a clean solution that doesn't mutate anything.</p>
+<p>The solutions I've thought up that don't mutate state end up being messier to an extent which I don't think makes it worth it. For example, I don't think it's worth doing something like using a long running interval/timer/system-time and remembering pauses via an offset.</p>
+<pre data-lang="TypeScript" class="language-TypeScript z-code"><code class="language-TypeScript" data-lang="TypeScript"><span class="z-source z-ts"><span class="z-meta z-type z-declaration z-ts"><span class="z-storage z-type z-type z-ts">type</span> <span class="z-entity z-name z-type z-alias z-ts">StopwatchAction</span> <span class="z-keyword z-operator z-assignment z-ts">=</span> <span class="z-string z-quoted z-single z-ts"><span class="z-punctuation z-definition z-string z-begin z-ts">&#39;</span>RUN/PAUSE<span class="z-punctuation z-definition z-string z-end z-ts">&#39;</span></span> <span class="z-keyword z-operator z-type z-ts">|</span> <span class="z-string z-quoted z-single z-ts"><span class="z-punctuation z-definition z-string z-begin z-ts">&#39;</span>RESET<span class="z-punctuation z-definition z-string z-end z-ts">&#39;</span></span></span><span class="z-punctuation z-terminator z-statement z-ts">;</span>
+
+<span class="z-meta z-function z-ts"><span class="z-storage z-type z-function z-ts">function</span> <span class="z-meta z-definition z-function z-ts"><span class="z-entity z-name z-function z-ts">createStopwatch_static</span></span><span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span>
+  <span class="z-variable z-parameter z-ts">control$</span><span class="z-meta z-type z-annotation z-ts"><span class="z-keyword z-operator z-type z-annotation z-ts">:</span> <span class="z-entity z-name z-type z-ts">Observable</span><span class="z-meta z-type z-parameters z-ts"><span class="z-punctuation z-definition z-typeparameters z-begin z-ts">&lt;</span></span><span class="z-meta z-type z-parameters z-ts"><span class="z-entity z-name z-type z-ts">StopwatchAction</span></span><span class="z-meta z-type z-parameters z-ts"><span class="z-punctuation z-definition z-typeparameters z-end z-ts">&gt;</span></span></span><span class="z-punctuation z-separator z-parameter z-ts">,</span>
+  <span class="z-variable z-parameter z-ts">interval</span><span class="z-meta z-type z-annotation z-ts"><span class="z-keyword z-operator z-type z-annotation z-ts">:</span> <span class="z-support z-type z-primitive z-ts">number</span>
+</span><span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span><span class="z-meta z-return z-type z-ts"><span class="z-keyword z-operator z-type z-annotation z-ts">:</span> <span class="z-entity z-name z-type z-ts">Observable</span><span class="z-meta z-type z-parameters z-ts"><span class="z-punctuation z-definition z-typeparameters z-begin z-ts">&lt;</span></span><span class="z-meta z-type z-parameters z-ts"><span class="z-support z-type z-primitive z-ts">number</span></span><span class="z-meta z-type z-parameters z-ts"><span class="z-punctuation z-definition z-typeparameters z-end z-ts">&gt;</span></span> </span><span class="z-meta z-block z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span>
+  <span class="z-keyword z-control z-flow z-ts">return</span> <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">defer</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-arrow z-ts"><span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span><span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span> </span><span class="z-meta z-arrow z-ts"><span class="z-storage z-type z-function z-arrow z-ts">=&gt;</span> <span class="z-meta z-block z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span>
+    <span class="z-meta z-var z-expr z-ts"><span class="z-storage z-type z-ts">let</span> <span class="z-meta z-var-single-variable z-expr z-ts"><span class="z-meta z-definition z-variable z-ts"><span class="z-variable z-other z-readwrite z-ts">count</span></span> </span><span class="z-keyword z-operator z-assignment z-ts">=</span> <span class="z-constant z-numeric z-decimal z-ts">0</span></span><span class="z-punctuation z-terminator z-statement z-ts">;</span>
+
+    <span class="z-keyword z-control z-flow z-ts">return</span> <span class="z-meta z-function-call z-ts"><span class="z-variable z-other z-object z-ts">control$</span><span class="z-punctuation z-accessor z-ts">.</span><span class="z-entity z-name z-function z-ts">pipe</span></span><span class="z-meta z-brace z-round z-ts">(</span>
+      <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">scan</span></span><span class="z-meta z-brace z-round z-ts">(</span>
+<span class="z-meta z-arrow z-ts">        <span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span><span class="z-meta z-parameter z-object-binding-pattern z-ts"><span class="z-punctuation z-definition z-binding-pattern z-object z-ts">{</span> <span class="z-variable z-parameter z-ts">running</span> <span class="z-punctuation z-definition z-binding-pattern z-object z-ts">}</span></span><span class="z-punctuation z-separator z-parameter z-ts">,</span> <span class="z-variable z-parameter z-ts">action</span><span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span> </span><span class="z-meta z-arrow z-ts"><span class="z-storage z-type z-function z-arrow z-ts">=&gt;</span>
+          </span><span class="z-variable z-other z-readwrite z-ts">action</span> <span class="z-keyword z-operator z-comparison z-ts">==</span> <span class="z-string z-quoted z-single z-ts"><span class="z-punctuation z-definition z-string z-begin z-ts">&#39;</span>RUN/PAUSE<span class="z-punctuation z-definition z-string z-end z-ts">&#39;</span></span>
+            <span class="z-keyword z-operator z-ternary z-ts">?</span> <span class="z-meta z-objectliteral z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span> <span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts">running</span></span><span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts"><span class="z-punctuation z-separator z-key-value z-ts">:</span></span> <span class="z-keyword z-operator z-logical z-ts">!</span><span class="z-variable z-other z-readwrite z-ts">running</span></span><span class="z-punctuation z-separator z-comma z-ts">,</span> <span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts">reset</span></span><span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts"><span class="z-punctuation z-separator z-key-value z-ts">:</span></span> <span class="z-constant z-language z-boolean z-false z-ts">false</span> </span><span class="z-punctuation z-definition z-block z-ts">}</span></span>
+            <span class="z-keyword z-operator z-ternary z-ts">:</span> <span class="z-meta z-objectliteral z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span> <span class="z-meta z-object z-member z-ts"><span class="z-variable z-other z-readwrite z-ts">running</span></span><span class="z-punctuation z-separator z-comma z-ts">,</span> <span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts">reset</span></span><span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts"><span class="z-punctuation z-separator z-key-value z-ts">:</span></span> <span class="z-constant z-language z-boolean z-true z-ts">true</span> </span><span class="z-punctuation z-definition z-block z-ts">}</span></span><span class="z-punctuation z-separator z-comma z-ts">,</span>
+        <span class="z-meta z-objectliteral z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span> <span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts">running</span></span><span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts"><span class="z-punctuation z-separator z-key-value z-ts">:</span></span> <span class="z-constant z-language z-boolean z-false z-ts">false</span></span><span class="z-punctuation z-separator z-comma z-ts">,</span> <span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts">reset</span></span><span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts"><span class="z-punctuation z-separator z-key-value z-ts">:</span></span> <span class="z-constant z-language z-boolean z-false z-ts">false</span> </span><span class="z-punctuation z-definition z-block z-ts">}</span></span>
+      <span class="z-meta z-brace z-round z-ts">)</span><span class="z-punctuation z-separator z-comma z-ts">,</span>
+      <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">concatWith</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">of</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-objectliteral z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span> <span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts">running</span></span><span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts"><span class="z-punctuation z-separator z-key-value z-ts">:</span></span> <span class="z-constant z-language z-boolean z-false z-ts">false</span></span><span class="z-punctuation z-separator z-comma z-ts">,</span> <span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts">reset</span></span><span class="z-meta z-object z-member z-ts"><span class="z-meta z-object-literal z-key z-ts"><span class="z-punctuation z-separator z-key-value z-ts">:</span></span> <span class="z-constant z-language z-boolean z-false z-ts">false</span> </span><span class="z-punctuation z-definition z-block z-ts">}</span></span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-punctuation z-separator z-comma z-ts">,</span>
+      <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">tap</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-arrow z-ts"><span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span><span class="z-meta z-parameter z-object-binding-pattern z-ts"><span class="z-punctuation z-definition z-binding-pattern z-object z-ts">{</span> <span class="z-variable z-parameter z-ts">reset</span> <span class="z-punctuation z-definition z-binding-pattern z-object z-ts">}</span></span><span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span> </span><span class="z-meta z-arrow z-ts"><span class="z-storage z-type z-function z-arrow z-ts">=&gt;</span> <span class="z-meta z-block z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span> <span class="z-keyword z-control z-conditional z-ts">if</span> <span class="z-meta z-brace z-round z-ts">(</span><span class="z-variable z-other z-readwrite z-ts">reset</span><span class="z-meta z-brace z-round z-ts">)</span> <span class="z-variable z-other z-readwrite z-ts">count</span> <span class="z-keyword z-operator z-assignment z-ts">=</span> <span class="z-constant z-numeric z-decimal z-ts">0</span><span class="z-punctuation z-terminator z-statement z-ts">;</span> <span class="z-punctuation z-definition z-block z-ts">}</span></span></span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-punctuation z-separator z-comma z-ts">,</span>
+      <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">switchMap</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-arrow z-ts"><span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span><span class="z-meta z-parameter z-object-binding-pattern z-ts"><span class="z-punctuation z-definition z-binding-pattern z-object z-ts">{</span> <span class="z-variable z-parameter z-ts">running</span> <span class="z-punctuation z-definition z-binding-pattern z-object z-ts">}</span></span><span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span> </span><span class="z-meta z-arrow z-ts"><span class="z-storage z-type z-function z-arrow z-ts">=&gt;</span>
+        </span><span class="z-variable z-other z-readwrite z-ts">running</span> <span class="z-keyword z-operator z-ternary z-ts">?</span> <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">timer</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-constant z-numeric z-decimal z-ts">0</span><span class="z-punctuation z-separator z-comma z-ts">,</span> <span class="z-variable z-other z-readwrite z-ts">interval</span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-meta z-function-call z-ts"><span class="z-punctuation z-accessor z-ts">.</span><span class="z-entity z-name z-function z-ts">pipe</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">map</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-arrow z-ts"><span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span><span class="z-variable z-parameter z-ts">_</span><span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span> </span><span class="z-meta z-arrow z-ts"><span class="z-storage z-type z-function z-arrow z-ts">=&gt;</span> </span><span class="z-variable z-other z-readwrite z-ts">count</span><span class="z-keyword z-operator z-increment z-ts">++</span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-meta z-brace z-round z-ts">)</span> <span class="z-keyword z-operator z-ternary z-ts">:</span> <span class="z-variable z-other z-constant z-ts">EMPTY</span>
+      <span class="z-meta z-brace z-round z-ts">)</span>
+    <span class="z-meta z-brace z-round z-ts">)</span><span class="z-punctuation z-terminator z-statement z-ts">;</span>
+  <span class="z-punctuation z-definition z-block z-ts">}</span></span></span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-punctuation z-terminator z-statement z-ts">;</span>
+<span class="z-punctuation z-definition z-block z-ts">}</span></span></span>
+
+<span class="z-comment z-line z-double-slash z-ts"><span class="z-punctuation z-definition z-comment z-ts">//</span></span><span class="z-comment z-line z-double-slash z-ts"> Create an OperatorFunction that can be used in an RxJS pipe</span>
+<span class="z-meta z-function z-ts"><span class="z-storage z-type z-function z-ts">function</span> <span class="z-meta z-definition z-function z-ts"><span class="z-entity z-name z-function z-ts">createStopwatch</span></span><span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span>
+  <span class="z-variable z-parameter z-ts">interval</span> <span class="z-keyword z-operator z-assignment z-ts">=</span> <span class="z-constant z-numeric z-decimal z-ts">1000</span>
+<span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span><span class="z-meta z-return z-type z-ts"><span class="z-keyword z-operator z-type z-annotation z-ts">:</span> <span class="z-entity z-name z-type z-ts">OperatorFunction</span><span class="z-meta z-type z-parameters z-ts"><span class="z-punctuation z-definition z-typeparameters z-begin z-ts">&lt;</span></span><span class="z-meta z-type z-parameters z-ts"><span class="z-entity z-name z-type z-ts">StopwatchAction</span><span class="z-punctuation z-separator z-comma z-ts">,</span> <span class="z-support z-type z-primitive z-ts">number</span></span><span class="z-meta z-type z-parameters z-ts"><span class="z-punctuation z-definition z-typeparameters z-end z-ts">&gt;</span></span> </span><span class="z-meta z-block z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span>
+  <span class="z-keyword z-control z-flow z-ts">return</span> <span class="z-meta z-arrow z-ts"><span class="z-variable z-parameter z-ts">control$</span> </span><span class="z-meta z-arrow z-ts"><span class="z-storage z-type z-function z-arrow z-ts">=&gt;</span> </span><span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">createStopwatch_static</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-variable z-other z-readwrite z-ts">control$</span><span class="z-punctuation z-separator z-comma z-ts">,</span> <span class="z-variable z-other z-readwrite z-ts">interval</span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-punctuation z-terminator z-statement z-ts">;</span>
+<span class="z-punctuation z-definition z-block z-ts">}</span></span></span>
+</span></code></pre>
+<h3 id="stopwatch-in-use">StopWatch in Use</h3>
+<p>Control a stopwatch with DOM events to set fields on the DOM.</p>
+<pre data-lang="TypeScript" class="language-TypeScript z-code"><code class="language-TypeScript" data-lang="TypeScript"><span class="z-source z-ts"><span class="z-comment z-line z-double-slash z-ts"><span class="z-punctuation z-definition z-comment z-ts">//</span></span><span class="z-comment z-line z-double-slash z-ts"> The user clicking buttons in the UI creates the input stream</span>
+<span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">merge</span></span><span class="z-meta z-brace z-round z-ts">(</span>
+  <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">fromEvent</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-variable z-other z-readwrite z-ts">startBtn</span><span class="z-punctuation z-separator z-comma z-ts">,</span> <span class="z-string z-quoted z-single z-ts"><span class="z-punctuation z-definition z-string z-begin z-ts">&#39;</span>click<span class="z-punctuation z-definition z-string z-end z-ts">&#39;</span></span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-meta z-function-call z-ts"><span class="z-punctuation z-accessor z-ts">.</span><span class="z-entity z-name z-function z-ts">pipe</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">map</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-arrow z-ts"><span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span><span class="z-variable z-parameter z-ts">_</span><span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span> </span><span class="z-meta z-arrow z-ts"><span class="z-storage z-type z-function z-arrow z-ts">=&gt;</span> </span><span class="z-string z-quoted z-single z-ts"><span class="z-punctuation z-definition z-string z-begin z-ts">&#39;</span>RUN/PAUSE<span class="z-punctuation z-definition z-string z-end z-ts">&#39;</span></span> <span class="z-keyword z-control z-as z-ts">as</span> <span class="z-storage z-modifier z-ts">const</span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-punctuation z-separator z-comma z-ts">,</span>
+  <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">fromEvent</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-variable z-other z-readwrite z-ts">resetBtn</span><span class="z-punctuation z-separator z-comma z-ts">,</span> <span class="z-string z-quoted z-single z-ts"><span class="z-punctuation z-definition z-string z-begin z-ts">&#39;</span>click<span class="z-punctuation z-definition z-string z-end z-ts">&#39;</span></span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-meta z-function-call z-ts"><span class="z-punctuation z-accessor z-ts">.</span><span class="z-entity z-name z-function z-ts">pipe</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">map</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-arrow z-ts"><span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span><span class="z-variable z-parameter z-ts">_</span><span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span> </span><span class="z-meta z-arrow z-ts"><span class="z-storage z-type z-function z-arrow z-ts">=&gt;</span> </span><span class="z-string z-quoted z-single z-ts"><span class="z-punctuation z-definition z-string z-begin z-ts">&#39;</span>RESET<span class="z-punctuation z-definition z-string z-end z-ts">&#39;</span></span> <span class="z-keyword z-control z-as z-ts">as</span> <span class="z-storage z-modifier z-ts">const</span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-meta z-brace z-round z-ts">)</span>
+<span class="z-meta z-brace z-round z-ts">)</span><span class="z-meta z-function-call z-ts"><span class="z-punctuation z-accessor z-ts">.</span><span class="z-entity z-name z-function z-ts">pipe</span></span><span class="z-meta z-brace z-round z-ts">(</span>
+<span class="z-punctuation z-whitespace z-comment z-leading z-ts">  </span><span class="z-comment z-line z-double-slash z-ts"><span class="z-punctuation z-definition z-comment z-ts">//</span></span><span class="z-comment z-line z-double-slash z-ts"> Operator function turns StopwatchActions into numbers</span>
+<span class="z-punctuation z-whitespace z-comment z-leading z-ts">  </span><span class="z-comment z-line z-double-slash z-ts"><span class="z-punctuation z-definition z-comment z-ts">//</span></span><span class="z-comment z-line z-double-slash z-ts"> The default interval is a second, so we don&#39;t set it</span>
+  <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">createStopwatch</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-brace z-round z-ts">)</span>
+<span class="z-punctuation z-whitespace z-comment z-leading z-ts">  </span><span class="z-comment z-line z-double-slash z-ts"><span class="z-punctuation z-definition z-comment z-ts">//</span></span><span class="z-comment z-line z-double-slash z-ts"> If the stopwatch emits an error, re-create the stopwatch</span>
+  <span class="z-meta z-function-call z-ts"><span class="z-entity z-name z-function z-ts">retry</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-brace z-round z-ts">)</span>
+<span class="z-meta z-brace z-round z-ts">)</span><span class="z-meta z-function-call z-ts"><span class="z-punctuation z-accessor z-ts">.</span><span class="z-entity z-name z-function z-ts">subscribe</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-meta z-arrow z-ts"><span class="z-variable z-parameter z-ts">seconds</span> </span><span class="z-meta z-arrow z-ts"><span class="z-storage z-type z-function z-arrow z-ts">=&gt;</span> <span class="z-meta z-block z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span>
+<span class="z-punctuation z-whitespace z-comment z-leading z-ts">  </span><span class="z-comment z-line z-double-slash z-ts"><span class="z-punctuation z-definition z-comment z-ts">//</span></span><span class="z-comment z-line z-double-slash z-ts"> Edit the DOM to display the current seconds</span>
+  <span class="z-variable z-other z-object z-ts">secondsField</span><span class="z-punctuation z-accessor z-ts">.</span><span class="z-variable z-other z-property z-ts">innerHTML</span> <span class="z-keyword z-operator z-assignment z-ts">=</span> <span class="z-variable z-other z-readwrite z-ts">seconds</span> <span class="z-keyword z-operator z-arithmetic z-ts">%</span> <span class="z-constant z-numeric z-decimal z-ts">60</span><span class="z-punctuation z-terminator z-statement z-ts">;</span>
+  <span class="z-variable z-other z-object z-ts">minuitesField</span><span class="z-punctuation z-accessor z-ts">.</span><span class="z-variable z-other z-property z-ts">innerHTML</span> <span class="z-keyword z-operator z-assignment z-ts">=</span> <span class="z-meta z-function-call z-ts"><span class="z-support z-constant z-math z-ts">Math</span><span class="z-punctuation z-accessor z-ts">.</span><span class="z-support z-function z-math z-ts">floor</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-variable z-other z-readwrite z-ts">seconds</span> <span class="z-keyword z-operator z-arithmetic z-ts">/</span> <span class="z-constant z-numeric z-decimal z-ts">60</span><span class="z-meta z-brace z-round z-ts">)</span> <span class="z-keyword z-operator z-arithmetic z-ts">%</span> <span class="z-constant z-numeric z-decimal z-ts">60</span><span class="z-punctuation z-terminator z-statement z-ts">;</span>
+  <span class="z-variable z-other z-object z-ts">hoursField</span><span class="z-punctuation z-accessor z-ts">.</span><span class="z-variable z-other z-property z-ts">innerHTML</span> <span class="z-keyword z-operator z-assignment z-ts">=</span> <span class="z-meta z-function-call z-ts"><span class="z-support z-constant z-math z-ts">Math</span><span class="z-punctuation z-accessor z-ts">.</span><span class="z-support z-function z-math z-ts">floor</span></span><span class="z-meta z-brace z-round z-ts">(</span><span class="z-variable z-other z-readwrite z-ts">seconds</span> <span class="z-keyword z-operator z-arithmetic z-ts">/</span> <span class="z-constant z-numeric z-decimal z-ts">3600</span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-punctuation z-terminator z-statement z-ts">;</span>
+<span class="z-punctuation z-definition z-block z-ts">}</span></span></span><span class="z-meta z-brace z-round z-ts">)</span><span class="z-punctuation z-terminator z-statement z-ts">;</span>
+</span></code></pre>
+
+<p><b><a href="#">Back to top</a></b></p>
+    </article>
+    <div class="toc" aria-hidden="true">
+      <div class="toc-sticky">
+        <h3>Index</h3>
+        <div class="toc-item">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/rxjs-stopwatch/#stopwatch">Stopwatch</a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/rxjs-stopwatch/#preamble"><small>- Preamble:</small></a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/rxjs-stopwatch/#the-problem"><small>- The Problem</small></a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/rxjs-stopwatch/#a-solution"><small>- A Solution</small></a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/rxjs-stopwatch/#stopwatch-in-use"><small>- StopWatch in Use</small></a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <hr />
+    <div class="c">
+      <nav>
+        <ul></ul>
+      </nav>
+      <p class="s90">Copyright &copy; 2023 One Small Step</p>
+      <nav>
+        <ul><li class="s90"> <a href="https://trequetrum.github.io/blog-onesmallstep/about/"> About </a> </li><li class="s90"> <a href="https://trequetrum.github.io/blog-onesmallstep/privacy/"> Privacy </a> </li><li class="s90"> <a href="https://trequetrum.github.io/blog-onesmallstep/sitemap.xml" target="_blank"> Sitemap </a> </li></ul>
+      </nav>
+    </div>
+  </footer>
+<span class="topout">
+<span class="topleft"> </span><a href="#" class="top" title="Back to Top"><i class="svgs svgh angu"></i></a>
+</span>
+</body>
+</html>

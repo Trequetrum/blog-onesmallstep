@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <script src="https://trequetrum.github.io/blog-onesmallstep/theme.min.js" integrity="sha384-IpIaa84kOKgkF5EJ0fD/kBe2wtIIsIB60ANGmuJxeA0dz5bSRfwBwp2/QybtQpU2"></script>
+  <link rel="stylesheet" href="https://trequetrum.github.io/blog-onesmallstep/abridge-switcher.css?h=48c4ccc424d544f703dd" />
+  <link rel="stylesheet" href="https://trequetrum.github.io/blog-onesmallstep/extra-styles.css?h=74f82ec9e1007752c4a6" />
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="preload" as="style" class="preStyle" href="https://trequetrum.github.io/blog-onesmallstep/katex.min.css" integrity="sha384-ZPe7yZ91iWxYumsBEOn7ieg8q/o+qh/hQpSaPow8T6BwALcXSCS6C6fSRPIAnTQs" />
+  <script defer src="https://trequetrum.github.io/blog-onesmallstep/search_index.en.js?h=24b4cf78626c8144ae60" integrity="sha384-+jHivRw49IuGzPJF8I4a2WoBsAoormvIgj4QtUx2vi8b0TM2aKNMoaT8PKfYJ8HG"></script>
+  <script defer src="https://trequetrum.github.io/blog-onesmallstep/abridge-bundle-nofacade.min.js?h=9bcf621a2fcab7336017" integrity="sha384-u8AROOUG6n2Xjk2+7pvkkfeSIqinjI1tmqeBpZRlZtc5KFO/8DyFfEir6fAE2wcq"></script>
+  <script defer src="https://trequetrum.github.io/blog-onesmallstep/katexbundle.min.js?h=a550ba0540c37778ffcb" integrity="sha384-ddSpLWE2IN4NTX956m9zVX0cUonZmEeunMpVZPgEcwmGficsSB8WtHlbuWkGPf8d"></script>
+  <meta name="base" content="https://trequetrum.github.io/blog-onesmallstep" />
+  <link rel="alternate" type="application/atom+xml" title="Atom/RSS Feed" href="https://trequetrum.github.io/blog-onesmallstep/atom.xml" />
+  <meta name="robots" content="index, follow" />
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <title>N-Tuple Sudoku Constraints Algorithm | One Small Step</title>
+  <meta name="author" content="Mark" />
+  <meta name="copyright" content="One Small Step" />
+  <meta name="description" content="Now let it work. Mischief, thou art afoot, Take thou what course thou wilt!" />
+  <link rel="canonical" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/" />
+  <meta name="keywords" content="Algorithm, Programming, Sudoku, Puzzle, Solution, Blog, Tech, Programming, Personal, Philosophy" />
+  <meta property="og:url" content="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/" />
+  <meta name="twitter:url" content="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/" />
+  <meta property="og:description" content="Now let it work. Mischief, thou art afoot, Take thou what course thou wilt!" />
+  <meta name="twitter:description" content="Now let it work. Mischief, thou art afoot, Take thou what course thou wilt!" />
+  <meta property="og:title" content="N-Tuple Sudoku Constraints Algorithm | One Small Step" />
+  <meta name="twitter:title" content="N-Tuple Sudoku Constraints Algorithm | One Small Step" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://trequetrum.github.io/blog-onesmallstep/banner.png" />
+  <meta property="og:image" content="https://trequetrum.github.io/blog-onesmallstep/banner.png" />
+  <meta property="og:site_name" content="One Small Step" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:type" content="website" />
+  <meta property="og:updated_time" content="2023-04-24" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#333333" />
+  <meta name="msapplication-TileColor" content="#333333" />
+  <link rel="manifest" href="https://trequetrum.github.io/blog-onesmallstep/site.webmanifest" />
+  <link rel="mask-icon" href="https://trequetrum.github.io/blog-onesmallstep/safari-pinned-tab.svg" color="#ff9900" />
+  <link rel="apple-touch-icon" sizes="180x180" href="https://trequetrum.github.io/blog-onesmallstep/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="https://trequetrum.github.io/blog-onesmallstep/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="https://trequetrum.github.io/blog-onesmallstep/favicon-16x16.png" />
+  <noscript><link rel="stylesheet" href="https://trequetrum.github.io/blog-onesmallstep/nojs.css" /></noscript>
+</head>
+<body>
+  <header>
+    <nav>
+      <div><h1><a href="https://trequetrum.github.io/blog-onesmallstep/"><img src="https://trequetrum.github.io/blog-onesmallstep/brackets_logo.png" alt="One" width="32" height="32" /> Small Step</a></h1></div>
+      <div>
+        <ul><li> <h2><a href="https://trequetrum.github.io/blog-onesmallstep/about/">About</a></h2> </li><li> <h2><a href="https://trequetrum.github.io/blog-onesmallstep/posts/">Posts</a></h2> </li><li> <h2><a href="https://trequetrum.github.io/blog-onesmallstep/categories/">Categories</a></h2> </li><li> <h2><a href="https://trequetrum.github.io/blog-onesmallstep/tags/">Tags</a></h2> </li><li class="js"><i type="reset" id="mode" class="svgs adjust"></i></li></ul>
+      </div>
+      <div>
+        <form autocomplete=off class="js" name="goSearch" id="searchbox">
+          <div class="searchd">
+            <input id="searchinput" type="text" placeholder="Search" title="Search" />
+            <button type="submit" title="Search"><i class="svgs search"></i></button>
+          </div>
+          <div><div id="suggestions"></div></div>
+        </form>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <article>
+        <h1><a href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/">N-Tuple Sudoku Constraints Algorithm</a></h1>
+        <span class="s95"> Mark<span class="hpad"> </span> April 24, 2023<span class="hpad"> </span> [<a href="https://trequetrum.github.io/blog-onesmallstep/categories/algorithm/">Algorithm</a>] #<a href="https://trequetrum.github.io/blog-onesmallstep/tags/purescript/">PureScript</a> </span>
+
+    <h1 id="sudoku-notations">Sudoku notations</h1>
+<p>This blog entry assumes the reader understands the rules of Sudoku.</p>
+<p>When filling in a Sudoku, you may think of each cell on the board as being either <span class=pink-emph>filled in</span> or <span class=pink-emph>empty</span>. As puzzles becomes more advanced, it's common for people to add notations or take notes in some way. The notations used here describe each cell in a board as all the remaining possibilities for that cell.</p>
+<p>Consider the following board where only a <span class=blue-emph><strong>5</strong></span> in the middle is given. You can then notice that the cell's row, column, and box have all had all the <span class=blue-emph><strong>5</strong></span>s removed. The rest of the cells can all still have any possibility.</p>
+ 
+<img src="board-5.png" alt="Vocab Picture" width="404" height="404" />
+<p>Because this is not a proper Sudoku, we've annotated everything that we can logically deduce and yet we haven't solved the puzzle. For a proper Sudoku, you can keep deducing reasons for removing possibilities from cells until each cell has only a single possibility left. Once this is done, the puzzle is solved.</p>
+<p>This blog aims to explain an algorithm for removing possibilities from a Sudoku Puzzle. The technique will not solve every proper Sudoku, but it will fully solve most of the puzzles you might find in a sudoku book and can be easily combined with a brute force algorithm to solve the rest. If you look up Sudoku solving techniques online, this algorithm is a generalization of the naked and hidden pairs technique, but generalized for tuples of any size.</p>
+<p>We'll discuss the technique, then explore some ways to efficiently implement the technique via bit-masking.</p>
+<h1 id="vocabulary">Vocabulary</h1>
+<p>Talking about Sudoku requires some vocabulary for which we'd better be on the same page (pun intended).</p>
+<p>We'll go through some of that here.</p>
+<ul>
+<li><span class=pink-emph><strong>Board:</strong></span> A 9x9 (rank-3) Sudoku board is a collection of 81 cells where each cell belongs to exactly 1 row, 1 column, and 1 box.</li>
+<li><span class=pink-emph><strong>Rank:</strong></span> A Sudoku of rank n is an n<sup>2</sup>×n<sup>2</sup> square grid, subdivided into n<sup>2</sup> boxes (each of size n×n). There are n<sup>2</sup> options used to fill out the board.</li>
+<li><span class=pink-emph><strong>Option:</strong></span> can be represented by any symbols, though typically options are the numbers used to fill a Sudoku board. On a 9x9 board, they are elements of the set <code>{1,2,3,4,5,6,7,8,9}</code></li>
+<li><span class=pink-emph><strong>Index:</strong></span> The name for a position on the board. On a 9x9 board, the set of indices are <code>{0..80}</code></li>
+<li><span class=pink-emph><strong>Cell:</strong></span> An index and a set of options. The set of options for a given cell is an encoding of all the possible options that a position on a board may eventually take. If a cell contains the set <code>{1,4,6,7,8}</code>, that means there are constraints on the board such that any of the other options are invalid. A cell is both a position on a board and a <strong>set</strong> of options. For a 9x9 board, the cardinality (number of possible options) of a cell is between 1 and 9 (no empty set).</li>
+<li><span class=pink-emph><strong>Forced/Solved Cell:</strong></span> A cell whose set of options has a cardinality of 1.</li>
+<li><span class=pink-emph><strong>Group:</strong></span> Predefined collection of cells (row, column, or box)
+<ul>
+<li><span class=pink-emph><strong>Row/Col/Box:</strong></span> Names for the 3 groups of a typical Sudoku board</li>
+<li><span class=pink-emph><strong>Peers:</strong></span> cells (specifically indices) that share a group</li>
+</ul>
+</li>
+</ul>
+<p>Here is an image highlighting some of these terms:</p>
+ 
+<img src="full-board-labels.png" alt="Vocab Picture" width="600" height="466" />
+<h2 id="the-one-rule">The One Rule</h2>
+<p>You have solved a Sudoku puzzle <strong>if and only if</strong> you</p>
+<blockquote>
+<p>Fill in the whole board using the set of options such that each group contains each option exactly once.</p>
+</blockquote>
+<h1 id="overview">Overview</h1>
+<p>To keep the language and examples from becoming overly verbose, I'm going to assume a rank-3 <em>(9x9)</em> Sudoku board throughout this explanation. There's nothing special about 9x9 Sudoku when it comes to n-tuple constraints and this approach works just as well with any rank Sudoku.</p>
+<p>One of the basic approaches to solving a Sudoku puzzle is to search each group (Row, Column, or Box) without regard for the state of the rest of the board. The aim is to split a group into two distinct subgroups such that the two subgroups can safely have no options in common.</p>
+<p>There are two approaches that allow you to mechanically find such subgroups. We’ll call these the <em>Naked constraint</em> and the <em>Hidden constraint</em>. </p>
+<ul>
+<li>If we discover these subgroups using the Naked constraint, we'll call the subgroup discovered a Naked Tuple. The other subgroup is implicitly just the rest of the group.</li>
+<li>If we discover these subgroups using the Hidden constraint, we'll call the subgroup discovered a Hidden Tuple. The other subgroup is, again, implicitly the rest of the group.</li>
+</ul>
+<p>I define <em>Naked constraint</em> and <em>Hidden constraint</em> below (In <strong>How do Tuples constrain a board?</strong>), but it's enlightening to first build some intuition of Naked and Hidden Tuples. Seeing how to find each tuple and understanding that the two are actually duals of one another, further simplifies the definition of these constraints.</p>
+<h2 id="n-tuple-examples">N-Tuple examples</h2>
+<p>Here's an imagine that show how <strong>either</strong> a naked tuple <strong>or</strong> a hidden tuple can be used to arrive at a new board state. There's an example for <span class=pink-emph>singleton</span>s and for <span class=pink-emph>pair</span>s.</p>
+ 
+<img src="naked-example.png" alt="Visual Example" width="1113" height="581" />
+<p>What follows is the same examples described via language:</p>
+<h3 id="naked-n-tuple-described-examples">Naked N-Tuple described examples</h3>
+<ul>
+<li><strong>Naked 1-Tuple:</strong> (<span class=pink-emph>Singleton</span>) There is a cell in this group that has only 1 option (the option 2). Therefore, all other cells in this group cannot contain a 2</li>
+<li><strong>Naked 2-Tuple:</strong> (<span class=pink-emph>Pair</span>) There are 2 cells that have only some of 2 options (2s or 3s). Therefore, all other cells in this group cannot contain a 2 or a 3.</li>
+<li><strong>Naked N-Tuple:</strong> There are N cells that have only some of N options. Therefore, all other cells in this group cannot contain any of these N options</li>
+</ul>
+<h3 id="hidden-n-tuple-described-examples">Hidden N-Tuple described examples</h3>
+<ul>
+<li><strong>Hidden 1-Tuple:</strong> (<span class=pink-emph>Singleton</span>) There is only 1 cell in this group that may contain a 2, therefore this cell can contain a only 2 (and no other options)</li>
+<li><strong>Hidden 2-Tuple:</strong> (<span class=pink-emph>Pair</span>) There are only 2 cells in this group that contain either a 2 or a 3, therefore these two cells can contain only 2 or 3</li>
+<li><strong>Hidden N-Tuple:</strong> There are only N cells that contain any of these N options, therefore these N cells can contain only these N options</li>
+</ul>
+<h1 id="how-to-find-a-tuple">How to find a Tuple</h1>
+<p>This dual nature of naked and hidden pairs is at the heart of what this algorithm does. In general, we find a tuple, update the annotations on the board, then repeat.</p>
+<p>Is it hard to find such tuples? </p>
+<p>Humans are pretty quick to spot <span class=pink-emph>singletons</span> and <span class=pink-emph>pairs</span>, though it can be difficult to see larger tuples. The process of finding a tuple can be seen as set operations on fairly small sets, and fairly small sets can be presented as binary numbers. Computers can perform these checks <strong>extremely</strong> efficiently. More impressive is that the time it takes to find a singleton is the same as the time it takes to discover any of the larger tuples (Though we'll see why we prefer smaller tuples regardless when we discuss optimizations)</p>
+ 
+<img src="tuple-impl.png" alt="Vocab Picture" width="600" height="272" />
+<p>There are a few set-operations you need to understand before you can start finding tuples.</p>
+<ol>
+<li>
+<p><span class=pink-emph><strong>Cardinality:</strong></span> A measure of the number of elements of the set. For example, if <strong>α</strong> is <code>{1,2,4,6,7,9}</code>, then the cardinality of <strong>α</strong> is six — <code>|α| == 6</code>. The cardinality of the empty set is zero — <code>|{}| == 0</code>.</p>
+</li>
+<li>
+<p><span class=pink-emph><strong>Superset:</strong></span> A set of options <strong>α</strong> is a superset of another set <strong>β</strong> if every option in <strong>β</strong> is also an option in <strong>α</strong>. So the set <code>{1,2,3,4,5,6,7,8,9}</code> is a superset of every other possible set of options. The set <code>{8}</code> is only a superset of <code>{8}</code> and <code>{}</code> (the empty set). Since cells cannot have a cardinality of zero, that means <code>{8}</code> is only a superset of cells that are solved with the option 8. </p>
+<ul>
+<li>Use this to find naked tuples</li>
+</ul>
+</li>
+<li>
+<p><span class=pink-emph><strong>Not Disjoint:</strong></span> If the intersection of two sets is inhabited, then they are not disjoint. The intersection of two sets is just the set of elements they have in common. <code>{5,6,7,8,9}</code> and <code>{1,3,5,7,9}</code> are not disjoint because they have this intersection: <code>{5,7,9}</code>. <code>{1,2,3}</code> and <code>{4,5,6}</code> are disjoint because their intersection is empty <code>{}</code>.</p>
+<ul>
+<li>Use this to find hidden tuples</li>
+</ul>
+</li>
+</ol>
+<h2 id="how-to-find-a-naked-n-tuple">How to find a Naked N-Tuple.</h2>
+<p>You might find a naked tuple if you:</p>
+<ol>
+<li>Pick any set of options (They have some cardinality of size <strong>n</strong>) </li>
+<li>Pick any group on the board. </li>
+<li>If the set you picked is a superset of exactly <strong>n</strong> cells in that group, then those <strong>n</strong> cells form a Naked N-Tuple.</li>
+</ol>
+<p>You will find every naked tuple if you do this for:</p>
+<ul>
+<li>Every combination of options that form a set (of which there are 511)</li>
+<li>Every group (of which there are 27) </li>
+</ul>
+<h2 id="how-to-find-a-hidden-n-tuple">How to find a Hidden N-Tuple</h2>
+<p>You might find a hidden tuple if you:</p>
+<ol>
+<li>Pick any set of options (They have some cardinality of size <strong>n</strong>) </li>
+<li>Pick any group on the board. </li>
+<li>If the set you picked is not disjoint with exactly <strong>n</strong> cells in that group, then those <strong>n</strong> cells form a Naked N-Tuple in that group.</li>
+</ol>
+<p>You will find every hidden tuple if you do this for:</p>
+<ul>
+<li>Every combination of options that form a set (of which there are 511)</li>
+<li>Every group (of which there are 27) </li>
+</ul>
+<h3 id="what-do-naked-and-hidden-n-tuples-have-in-common">What do Naked and Hidden N-Tuples have in common?</h3>
+<p>When describing how to find a Hidden or Naked Tuple, the process is nearly identical. Intuitively you can use the same algorithm to find both. Moreover, if you look for both at the same time, you don't have to repeat steps 1 and 2 from above.</p>
+<p>There is a much stronger relationship between these two constraints. For any value of N, every Naked N Tuple has a corresponding Hidden (9-N) Tuple and vice versa.</p>
+<p>For example: the following <code>[]</code>s contain a group. Each cell is just an index paired with a set of options (These indices happen to be from a box in the board.)</p>
+ 
+<img src="tuple-common.png" alt="Vocab Picture" width="246" height="246" />
+<pre class="z-code"><code><span class="z-text z-plain">[ (0  { 1,2,3,4,5,6,7,8,9 })
+, (1  {   2,3,4,5,6,7,8,9 })
+, (2  {   2,3,4,5,6,7,8,9 })
+, (9  {   2,3,4,5,6,7,8,9 })
+, (10 {   2,3,4,5,6,7,8,9 })
+, (11 {   2,3,4,5,6,7,8,9 })
+, (18 {   2,3,4,5,6,7,8,9 })
+, (19 {   2,3,4,5,6,7,8,9 })
+, (20 {   2,3,4,5,6,7,8,9 })
+]
+</span></code></pre>
+<ul>
+<li>The set {1} with cardinality 1 is not disjoint with exactly 1 cell in this group (The cell with index 0). </li>
+<li>Therefore: this cell is a hidden 1-tuple in this group. </li>
+</ul>
+<p>If that's so, what is the corresponding naked 8-tuple? Well: </p>
+<ul>
+<li>The set {2,3,4,5,6,7,8,9} with cardinality 8 is a superset of exactly 8 cells in this group (The cells with indices 1,2,9,10,11,18,19,20).</li>
+<li>Therefore: these cells are a Naked 8-Tuple in this group.</li>
+</ul>
+<p><em>(A moment's reflection with show that...)</em> This pattern holds for every Hidden and Naked Tuple. Hidden Tuples are the dual of naked Tuples. </p>
+<h3 id="if-every-naked-tuple-has-a-corresponding-hidden-tuple-and-vice-versa-do-we-need-both">If every Naked Tuple has a corresponding Hidden Tuple and vice versa, do we need both?</h3>
+<p>Strictly speaking, no. They represent the same constraints on the board.</p>
+<p><strong>But</strong>: when designing an algorithm smaller tuples are better. This is for a few reasons.</p>
+<ol>
+<li>If you look for small tuples first, you can narrow the search space while looking for larger tuples. For example: if the cells (2 {3,4}) &amp; (8 {3,4}) are a 2-Tuple, then no other n-tuples of size 2, 3, 4, etc in the same group need to search the indices 2 or 8 nor the options 3 or 4. This doesn't work in reverse. Consider if cells (2 {3}) &amp; (8 {3,4}) are a 2-Tuple, we still want to find the naked 1-tuple (2 {3}) since it would represent a constraint that removes the 3 from (8 {3,4}).</li>
+<li>Tuples can exist in more than one group at a time. If we find a 1-tuple in the first row, this is guaranteed to also be a 1-tuple in a column and a box (Every index has exactly 1 row, 1 column, and 1 box). In a 9x9 board, n-tuples of size 1 always have 3 groups, while n-tuples of size 2 and 3 may have up to 2 groups. Smaller tuples are better because they can be constraints for and narrow the search space in multiple groups at once.</li>
+<li>If you look for both Hidden and Naked tuples at once, you can stop looking after you've searched for n-tuples of size 4. Hidden Tuples of sizes 1 to 4 correspond to Naked Tuples of sizes 9 to 5 and vice versa (Naked Tuples of sizes 1 to 4 correspond to Hidden Tuples of sizes 9 to 5)</li>
+</ol>
+<h1 id="how-tuples-constrain-a-board">How Tuples Constrain a Board</h1>
+<p>An N-Tuple is a set of options with cardinality <strong>n</strong>, paired with a list of indices of length <strong>n</strong>.<br />
+Each N-Tuple constrains the board in 2 ways:</p>
+<ol>
+<li><strong>Naked  Constraint:</strong> Constrain the cells at each index to be a subset of the set of options.</li>
+<li><strong>Hidden Constraint:</strong> Constrain the peers of this n-Tuple to be disjoint with the set of options.</li>
+</ol>
+<p>In either case, you remove the minimal number of elements possible such that this constraint is met.</p>
+<p><strong>The peers of an n-tuple:</strong></p>
+<ul>
+<li>The peers of a cell are all the other cells that share a group with it. Remember that each cell is part of three groups.</li>
+<li>The peers of a list of cells are the cells that share a group with with every cell in the list. A tuple must share at least 1 group. The cells with index 0 and 12 have no peers can therefore never be a valid 2-tuple.</li>
+</ul>
+<p><strong>Notice the symmetry here:</strong></p>
+<ol>
+<li>We find a Naked Tuple by discovering that the first constraint is satisfied and therefore can enforce the second constraint on the board.</li>
+<li>We find a Hidden Tuple by discovering that the second constraint is satisfied and therefore can enforce the first constraint n the board.</li>
+</ol>
+<p>So while each tuple can enforce both constraints, only one of the constraints will ever change the cells on the board. One of the two constraints will already have been met.</p>
+<h1 id="representing-data">Representing Data</h1>
+<h2 id="representing-a-cell">Representing a Cell</h2>
+<p>A fast a simple way to encode the set of options for a cell is as an integer bit-field. In the binary representation, each digit represents a true/false value for the question (is n an element of this cell's set).</p>
+<pre class="z-code"><code><span class="z-text z-plain">000000000 is the empty set {} 
+000000001 is the set {1} 
+000000010 is the set {2} 
+000000100 is the set {3} 
+000000111 is the set {1,2,3} 
+101010101 is the set {1,3,5,7,9} 
+111111111 is the set {1,2,3,4,5,6,7,8,9} 
+</span></code></pre>
+<h2 id="representing-a-board">Representing a board</h2>
+<p>A board can be represented by the unconstrained options for each cell. In this way, a starting board constrains each clue as the only option for the given cell and leaves all other options unconstrained.</p>
+<p>These representations all describe the same starting board:</p>
+ 
+<img src="board-example.png" alt="Sudoku Example" width="404" height="404" />
+<ul>
+<li>Integer base10</li>
+</ul>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  [ <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">8</span>,  <span class="z-constant z-numeric z-purescript">32</span>, <span class="z-constant z-numeric z-purescript">64</span>, <span class="z-constant z-numeric z-purescript">2</span>,  <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>
+  , <span class="z-constant z-numeric z-purescript">16</span>, <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">128</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">256</span>,<span class="z-constant z-numeric z-purescript">32</span>
+  , <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">32</span>, <span class="z-constant z-numeric z-purescript">4</span>,  <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">8</span>,  <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">128</span>
+  , <span class="z-constant z-numeric z-purescript">4</span>,  <span class="z-constant z-numeric z-purescript">128</span>,<span class="z-constant z-numeric z-purescript">2</span>,  <span class="z-constant z-numeric z-purescript">1</span>,  <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">256</span>,<span class="z-constant z-numeric z-purescript">32</span>, <span class="z-constant z-numeric z-purescript">511</span>
+  , <span class="z-constant z-numeric z-purescript">8</span>,  <span class="z-constant z-numeric z-purescript">64</span>, <span class="z-constant z-numeric z-purescript">16</span>, <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">1</span>,  <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>
+  , <span class="z-constant z-numeric z-purescript">256</span>,<span class="z-constant z-numeric z-purescript">1</span>,  <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">2</span>,  <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">8</span>,  <span class="z-constant z-numeric z-purescript">16</span>, <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>
+  , <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">2</span>,  <span class="z-constant z-numeric z-purescript">256</span>
+  , <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">1</span>,  <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">64</span>, <span class="z-constant z-numeric z-purescript">8</span>,  <span class="z-constant z-numeric z-purescript">4</span>
+  , <span class="z-constant z-numeric z-purescript">2</span>,  <span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">32</span>, <span class="z-constant z-numeric z-purescript">4</span>,  <span class="z-constant z-numeric z-purescript">128</span>,<span class="z-constant z-numeric z-purescript">511</span>,<span class="z-constant z-numeric z-purescript">1</span>
+  ]
+</span></code></pre>
+<ul>
+<li>Integer base2:</li>
+</ul>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  [ <span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000001000</span>,<span class="z-constant z-numeric z-purescript">000100000</span>,<span class="z-constant z-numeric z-purescript">001000000</span>,<span class="z-constant z-numeric z-purescript">000000010</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>
+  , <span class="z-constant z-numeric z-purescript">000010000</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">010000000</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">100000000</span>,<span class="z-constant z-numeric z-purescript">000100000</span>
+  , <span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000100000</span>,<span class="z-constant z-numeric z-purescript">000000100</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000001000</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">010000000</span>
+  , <span class="z-constant z-numeric z-purescript">000000100</span>,<span class="z-constant z-numeric z-purescript">010000000</span>,<span class="z-constant z-numeric z-purescript">000000010</span>,<span class="z-constant z-numeric z-purescript">000000001</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">100000000</span>,<span class="z-constant z-numeric z-purescript">000100000</span>,<span class="z-constant z-numeric z-purescript">111111111</span>
+  , <span class="z-constant z-numeric z-purescript">000001000</span>,<span class="z-constant z-numeric z-purescript">001000000</span>,<span class="z-constant z-numeric z-purescript">000010000</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000000001</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>
+  , <span class="z-constant z-numeric z-purescript">100000000</span>,<span class="z-constant z-numeric z-purescript">000000001</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000000010</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000001000</span>,<span class="z-constant z-numeric z-purescript">000010000</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>
+  , <span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000000010</span>,<span class="z-constant z-numeric z-purescript">100000000</span>
+  , <span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000000001</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">001000000</span>,<span class="z-constant z-numeric z-purescript">000001000</span>,<span class="z-constant z-numeric z-purescript">000000100</span>
+  , <span class="z-constant z-numeric z-purescript">000000010</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000100000</span>,<span class="z-constant z-numeric z-purescript">000000100</span>,<span class="z-constant z-numeric z-purescript">010000000</span>,<span class="z-constant z-numeric z-purescript">111111111</span>,<span class="z-constant z-numeric z-purescript">000000001</span>
+  ]
+</span></code></pre>
+<ul>
+<li>As sets of options, converted to strings:</li>
+</ul>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  [ <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>4<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>6<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>7<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>2<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>
+  , <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>5<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>8<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>9<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>6<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>
+  , <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>6<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>3<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>4<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>8<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>
+  , <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>3<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>8<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>2<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>1<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>9<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>6<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>
+  , <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>4<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>7<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>5<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>1<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>
+  , <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>9<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>1<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>2<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>4<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>5<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>
+  , <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>2<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>9<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>
+  , <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>1<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>7<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>4<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>3<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>
+  , <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>2<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>6<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>3<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>8<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,        <span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>123456789<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>,<span class="z-string z-quoted z-double z-purescript"><span class="z-punctuation z-definition z-string z-begin z-purescript">&quot;</span>1<span class="z-punctuation z-definition z-string z-end z-purescript">&quot;</span></span>
+  ]
+</span></code></pre>
+<p>The starting board above has 38 easy to spot naked 1 Tuples.</p>
+<p>If we consider cells with the set of options <code>{4}</code>, then </p>
+<ul>
+<li>cell <code>board[2]</code> is a Naked 1 Tuple in Row 0, Column 2, and Box 0.</li>
+<li>cell <code>board[22]</code> is a naked 1 Tuple in Row 2, Column 4, and Box 1.</li>
+<li>3 more 1-Tuples follow this pattern with &quot;4&quot;</li>
+</ul>
+<p>If we consider cells with the set of options <code>{4,6}</code>, then</p>
+<ul>
+<li>cells <code>board[2]</code>&amp;<code>board[3]</code> are a Naked 2 Tuple in Row 0</li>
+<li>cells <code>board[2]</code>&amp;<code>board[19]</code> are a Naked 2 Tuple in Box 0</li>
+<li>cells <code>board[22]</code>&amp;<code>board[76]</code> are a Naked 2 Tuple in Column 3</li>
+</ul>
+<p>Lets apply the Naked 1-Tuple constraints to this starting board:</p>
+ 
+<img src="board-example-cont.png" alt="Sudoku Example" width="404" height="404" />
+<p>This would be the output of one iteration of the Naked 1 Tuple algorithm. <strong>Aside:</strong> This iteration has revealed some Naked 1 Tuples which where not present before, so the Naked 1 Tuple algorithm could be run for another iteration. This project encodes this sort of information using the <code>Stateful</code> abstract data type in <code>Stateful.purs</code>.</p>
+<p>Row 4 now has an interesting application of <strong>Naked</strong> 3-Tuples.<br />
+Consider cells with only the set of options <code>{3,8,9}</code>:</p>
+<ul>
+<li><code>board[39]</code> = <code>{3,9}</code>. <code>board[40]</code> = <code>{3,8,9}</code> &amp; <code>board[43]</code> = <code>{3,8}</code></li>
+<li>Every other cell in Row 4 has at least 1 option that isn't a 3, 8 or 9</li>
+<li>Therefore, no other cells in Row 4 may contain a 3, 8 or 9</li>
+<li>Therefore, <code>board[41]</code> which currently has <code>{6,8,9}</code>, can be further constrained to <code>{6}</code></li>
+</ul>
+<p>Remember that every Naked N-Tuple there has a corresponding Hidden 9-N Tuple.<br />
+Row 4 has the same application of a <strong>Hidden</strong> 6-Tuple.<br />
+Consider cells with the set of options <code>{1,2,4,5,6,7}</code></p>
+<ul>
+<li><code>board[n]</code> where n = 36,37,38,41,42,44 are the only cells in Row 4 that have at least one of any of the options 1,2,4,5,6, or 7</li>
+<li>Therefore, these 6 cells in Row must contain only 1,2,4,5,6, or 7 (and no other options)</li>
+<li>Therefore, <code>board[41]</code> which currently has <code>{6,8,9}</code>, can be further constrained to <code>{6}</code></li>
+</ul>
+<h2 id="groups">Groups</h2>
+<p>This is how a group might look for the 0th box in a Sudoku with board-size 9.<br />
+This is just made up and not based on the board shown above.</p>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">unit <span class="z-keyword z-operator z-purescript">=</span> select [<span class="z-constant z-numeric z-purescript">0</span>,<span class="z-constant z-numeric z-purescript">1</span>,<span class="z-constant z-numeric z-purescript">2</span>,<span class="z-constant z-numeric z-purescript">9</span>,<span class="z-constant z-numeric z-purescript">10</span>,<span class="z-constant z-numeric z-purescript">11</span>,<span class="z-constant z-numeric z-purescript">18</span>,<span class="z-constant z-numeric z-purescript">19</span>,<span class="z-constant z-numeric z-purescript">20</span>] sudokuBoard <span class="z-keyword z-operator z-purescript">==</span>
+  [ <span class="z-constant z-numeric z-purescript">000000001</span> <span class="z-comment z-line z-purescript">-- unit[0] == sudokuBoard[0] is a cell that has only 1 of 9 possible symbols as an option</span>
+  , <span class="z-constant z-numeric z-purescript">101010101</span> <span class="z-comment z-line z-purescript">-- unit[1] == sudokuBoard[1] is a cell that has 5 of 9 possible symbols as an option</span>
+  , <span class="z-constant z-numeric z-purescript">000100010</span> <span class="z-comment z-line z-purescript">-- unit[2] == sudokuBoard[2]</span>
+  , <span class="z-constant z-numeric z-purescript">000111000</span> <span class="z-comment z-line z-purescript">-- unit[3] == sudokuBoard[9]</span>
+  , <span class="z-constant z-numeric z-purescript">010000000</span>
+  , <span class="z-constant z-numeric z-purescript">000110000</span>
+  , <span class="z-constant z-numeric z-purescript">000110000</span>
+  , <span class="z-constant z-numeric z-purescript">000110000</span>
+  , <span class="z-constant z-numeric z-purescript">000110000</span> <span class="z-comment z-line z-purescript">-- unit[8] == sudokuBoard[20]</span>
+  ]
+</span></code></pre>
+<h3 id="a-detour-into-purescript">A detour into purescript.</h3>
+<p>If we consider the unconstrained options in a cell as a set of options, then we can use bitwise operations to describe two important relationships between cells.</p>
+<p><strong>isSuperset</strong> helps us find Naked N-Tuples</p>
+<ul>
+<li>Does cell <code>a</code> contain at least every option found in cell <code>b</code>?</li>
+</ul>
+<p><strong>Not Disjoint</strong> helps us find Hidden N-Tuples</p>
+<ul>
+<li>Do two cells share any options in common?</li>
+<li>Is the union of two cells inhabited?</li>
+</ul>
+<p><span class=blue-emph>OR</span> is the bitwise OR operation.<br />
+<span class=blue-emph>AND</span> is the bitwise AND operation.</p>
+<p>This is how this might be written in Purescript</p>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  <span class="z-keyword z-other z-purescript">type</span> <span class="z-constant z-other z-purescript">Cell</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-other z-purescript">Int</span>
+
+<span class="z-meta z-declaration z-function z-purescript">  <span class="z-entity z-name z-function z-purescript">isSuperset</span><span class="z-keyword z-operator z-has-type z-purescript">::</span> <span class="z-storage z-type z-purescript">Cell</span> <span class="z-arrow z-operator z-purescript"><span class="z-keyword z-operator z-purescript">-&gt;</span></span> <span class="z-storage z-type z-purescript">Cell</span> <span class="z-arrow z-operator z-purescript"><span class="z-keyword z-operator z-purescript">-&gt;</span></span> <span class="z-storage z-type z-purescript">Boolean</span></span>
+  isSuperset a b <span class="z-keyword z-operator z-purescript">=</span> a <span class="z-constant z-other z-purescript">OR</span> b <span class="z-keyword z-operator z-purescript">==</span> a
+
+<span class="z-meta z-declaration z-function z-purescript">  <span class="z-entity z-name z-function z-purescript">notDisjoint</span><span class="z-keyword z-operator z-has-type z-purescript">::</span> <span class="z-storage z-type z-purescript">Cell</span> <span class="z-arrow z-operator z-purescript"><span class="z-keyword z-operator z-purescript">-&gt;</span></span> <span class="z-storage z-type z-purescript">Cell</span> <span class="z-arrow z-operator z-purescript"><span class="z-keyword z-operator z-purescript">-&gt;</span></span> <span class="z-storage z-type z-purescript">Boolean</span></span>
+  notDisjoint a b <span class="z-keyword z-operator z-purescript">=</span> a <span class="z-constant z-other z-purescript">AND</span> b <span class="z-keyword z-operator z-purescript">/=</span> <span class="z-constant z-numeric z-purescript">0</span>
+</span></code></pre>
+<h1 id="algorithm">Algorithm</h1>
+<h2 id="hidden-n-tuples-naked-n-tuples-algorithm">Hidden N Tuples &amp; Naked N Tuples Algorithm</h2>
+<p>This algorithm works over groups (Rows, Columns, and Boxes), what's described here can be done for each group in turn.</p>
+<p>The general flow is to generate actions for every group, and then apply those actions to update the board state. That's one iteration of the algorithm. If you've generated any actions that have updated the board state, then you can run a second iteration of this algorithm on the new board. <strong>Aside:</strong> In this project, <code>hiddenTuples</code> and <code>nakedTuples</code> are strategies that each describe one iteration and <code>untilStable</code> can re-run any strategy until it doesn't update the board anymore.</p>
+<p>The algorithm iterates through possible cells (for board-size of 9, this is integers between 1 and 511), and gets board indices of the group that have a <code>notDisjoint</code> or <code>isSuperset</code> relationship with this cell</p>
+<p>Examples from the group shown above:<br />
+Integers in these arrays correspond to indices in the board.<br />
+In this example, cell <code>000000001</code> is:</p>
+<ul>
+<li>notDisjoint with the cells at indices 0 and 1</li>
+<li>A superset of a cell at index 0</li>
+</ul>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  unit <span class="z-keyword z-operator z-purescript">=</span> select [<span class="z-constant z-numeric z-purescript">0</span>,<span class="z-constant z-numeric z-purescript">1</span>,<span class="z-constant z-numeric z-purescript">2</span>,<span class="z-constant z-numeric z-purescript">9</span>,<span class="z-constant z-numeric z-purescript">10</span>,<span class="z-constant z-numeric z-purescript">11</span>,<span class="z-constant z-numeric z-purescript">18</span>,<span class="z-constant z-numeric z-purescript">19</span>,<span class="z-constant z-numeric z-purescript">20</span>] sudokuBoard
+  <span class="z-comment z-block z-purescript">{----- For Reference ---------
+         [ 000000001 -- 0
+         , 101010101 -- 1 
+         , 000100010 -- 2
+         , 000111000 -- 9
+         , 010000000 -- 10
+         , 000110000 -- 11
+         , 000110000 -- 18
+         , 000110000 -- 19
+         , 000110000 -- 20
+         ] 
+  ------------------------------}</span> 
+  [ {cell<span class="z-keyword z-operator z-purescript">:</span> <span class="z-constant z-numeric z-purescript">000000001</span>, notDisjoint<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">0</span>,<span class="z-constant z-numeric z-purescript">1</span>] superset<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">0</span>] }
+  , {cell<span class="z-keyword z-operator z-purescript">:</span> <span class="z-constant z-numeric z-purescript">000000010</span>, notDisjoint<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">2</span>] superset<span class="z-keyword z-operator z-purescript">:</span> <span class="z-constant z-other z-purescript">[]</span> }
+  , {cell<span class="z-keyword z-operator z-purescript">:</span> <span class="z-constant z-numeric z-purescript">000000011</span>, notDisjoint<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">0</span>,<span class="z-constant z-numeric z-purescript">1</span>,<span class="z-constant z-numeric z-purescript">2</span>] superset<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">0</span>] }
+  , {cell<span class="z-keyword z-operator z-purescript">:</span> <span class="z-constant z-numeric z-purescript">000000100</span>, notDisjoint<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">1</span>] superset<span class="z-keyword z-operator z-purescript">:</span> <span class="z-constant z-other z-purescript">[]</span> }
+  , {cell<span class="z-keyword z-operator z-purescript">:</span> <span class="z-constant z-numeric z-purescript">000000101</span>, notDisjoint<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">0</span>,<span class="z-constant z-numeric z-purescript">1</span>] superset<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">0</span>] }
+  , <span class="z-keyword z-operator z-purescript">...</span>
+  , {cell<span class="z-keyword z-operator z-purescript">:</span> <span class="z-constant z-numeric z-purescript">111111110</span>, notDisjoint<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">1</span>,<span class="z-constant z-numeric z-purescript">2</span>,<span class="z-constant z-numeric z-purescript">9</span>,<span class="z-constant z-numeric z-purescript">10</span>,<span class="z-constant z-numeric z-purescript">11</span>,<span class="z-constant z-numeric z-purescript">18</span>,<span class="z-constant z-numeric z-purescript">19</span>,<span class="z-constant z-numeric z-purescript">20</span>] superset<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">2</span>,<span class="z-constant z-numeric z-purescript">9</span>,<span class="z-constant z-numeric z-purescript">10</span>,<span class="z-constant z-numeric z-purescript">11</span>,<span class="z-constant z-numeric z-purescript">18</span>,<span class="z-constant z-numeric z-purescript">19</span>,<span class="z-constant z-numeric z-purescript">20</span>] }
+  , {cell<span class="z-keyword z-operator z-purescript">:</span> <span class="z-constant z-numeric z-purescript">111111111</span>, notDisjoint<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">0</span>,<span class="z-constant z-numeric z-purescript">1</span>,<span class="z-constant z-numeric z-purescript">2</span>,<span class="z-constant z-numeric z-purescript">9</span>,<span class="z-constant z-numeric z-purescript">10</span>,<span class="z-constant z-numeric z-purescript">11</span>,<span class="z-constant z-numeric z-purescript">18</span>,<span class="z-constant z-numeric z-purescript">19</span>,<span class="z-constant z-numeric z-purescript">20</span>] superset<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">0</span>,<span class="z-constant z-numeric z-purescript">1</span>,<span class="z-constant z-numeric z-purescript">2</span>,<span class="z-constant z-numeric z-purescript">9</span>,<span class="z-constant z-numeric z-purescript">10</span>,<span class="z-constant z-numeric z-purescript">11</span>,<span class="z-constant z-numeric z-purescript">18</span>,<span class="z-constant z-numeric z-purescript">19</span>,<span class="z-constant z-numeric z-purescript">20</span>] }
+  ]
+</span></code></pre>
+<p>Here is how we mechanically decide whether we have found a Naked/Hidden N Tuple:</p>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">size notDisjoint <span class="z-keyword z-operator z-purescript">=</span> length notDisjoint
+size superset <span class="z-keyword z-operator z-purescript">=</span> length superset
+size cell <span class="z-keyword z-operator z-purescript">=</span> <span class="z-keyword z-operator z-purescript">...</span> <span class="z-comment z-line z-purescript">-- number of 1s in binary representation of cell</span>
+
+<span class="z-keyword z-control z-purescript">if</span> size cell <span class="z-keyword z-operator z-purescript">==</span> size superset) <span class="z-keyword z-control z-purescript">then</span> <span class="z-comment z-line z-purescript">-- this is a naked tuple</span>
+<span class="z-keyword z-control z-purescript">if</span> <span class="z-keyword z-operator z-purescript">...</span> <span class="z-keyword z-operator z-purescript">&gt;=</span> <span class="z-keyword z-operator z-purescript">...</span> superset) <span class="z-keyword z-control z-purescript">then</span> <span class="z-comment z-line z-purescript">-- I&#39;m not interested </span>
+<span class="z-keyword z-control z-purescript">if</span> <span class="z-keyword z-operator z-purescript">...</span> <span class="z-keyword z-operator z-purescript">&lt;</span> <span class="z-keyword z-operator z-purescript">...</span> superset) <span class="z-keyword z-control z-purescript">then</span> <span class="z-comment z-line z-purescript">-- this board is not valid</span>
+
+<span class="z-keyword z-control z-purescript">if</span> size cell <span class="z-keyword z-operator z-purescript">==</span> size notDisjoint) <span class="z-keyword z-control z-purescript">then</span> <span class="z-comment z-line z-purescript">-- this is a hidden tuple</span>
+<span class="z-keyword z-control z-purescript">if</span> <span class="z-keyword z-operator z-purescript">...</span> <span class="z-keyword z-operator z-purescript">&gt;</span> <span class="z-keyword z-operator z-purescript">...</span> notDisjoint) <span class="z-keyword z-control z-purescript">then</span> <span class="z-comment z-line z-purescript">-- this board is not valid</span>
+<span class="z-keyword z-control z-purescript">if</span> <span class="z-keyword z-operator z-purescript">...</span> <span class="z-keyword z-operator z-purescript">&lt;=</span> <span class="z-keyword z-operator z-purescript">...</span> notDisjoint) <span class="z-keyword z-control z-purescript">then</span> <span class="z-comment z-line z-purescript">-- I&#39;m not interested</span>
+</span></code></pre>
+<p>Each tuple found can generate actions that update the board state.</p>
+<h3 id="generating-actions-for-naked-tuples">Generating Actions for Naked Tuples:</h3>
+<p>For all indices that have a naked tuple, drop that option in all other indices for the unit 
+Example Naked 1-Tuple:</p>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  <span class="z-constant z-numeric z-purescript">000000001</span> <span class="z-keyword z-operator z-purescript">=</span> superset<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">0</span>]
+  <span class="z-support z-function z-prelude z-bits z-purescript">complement</span> <span class="z-constant z-numeric z-purescript">000000001</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">111111110</span>
+</span></code></pre>
+<p>Generated Actions: </p>
+<ul>
+<li>indices of interest is the difference between indices in the unit and indices that superset found </li>
+<li>indices of interest = [0,1,2,9,10,11,18,19,20] \ [0] == [1,2,9,10,11,18,19,20]</li>
+</ul>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  board[<span class="z-constant z-numeric z-purescript">1</span>] <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">101010101</span> <span class="z-constant z-other z-purescript">AND</span> <span class="z-constant z-numeric z-purescript">111111110</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">101010100</span>
+  board[<span class="z-constant z-numeric z-purescript">2</span>] <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">000100010</span> <span class="z-constant z-other z-purescript">AND</span> <span class="z-constant z-numeric z-purescript">111111110</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">000100010</span>
+  board[<span class="z-constant z-numeric z-purescript">9</span>] <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">000111000</span> <span class="z-constant z-other z-purescript">AND</span> <span class="z-constant z-numeric z-purescript">111111110</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">000111000</span>
+  <span class="z-keyword z-operator z-purescript">...</span>
+  board[<span class="z-constant z-numeric z-purescript">20</span>] <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">000110000</span> <span class="z-constant z-other z-purescript">AND</span> <span class="z-constant z-numeric z-purescript">111111110</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">000110000</span>
+</span></code></pre>
+<p>Generalized:</p>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  board[n] <span class="z-keyword z-operator z-purescript">=</span> board[n] <span class="z-constant z-other z-purescript">AND</span> (<span class="z-support z-function z-prelude z-bits z-purescript">complement</span> cell)
+  <span class="z-keyword z-other z-purescript">where</span>
+  n is an index <span class="z-keyword z-control z-purescript">of</span> interest
+  cell is the possible combination <span class="z-keyword z-control z-purescript">of</span> options that generated n
+</span></code></pre>
+<h3 id="generating-actions-for-hidden-tuples">Generating Actions for Hidden Tuples:</h3>
+<p>For all indices that have a hidden tuple, drop all other options at those indices 
+Example Hidden 1-Tuple:</p>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  <span class="z-constant z-numeric z-purescript">000000010</span> <span class="z-keyword z-operator z-purescript">=</span> notDisjoint<span class="z-keyword z-operator z-purescript">:</span> [<span class="z-constant z-numeric z-purescript">2</span>]
+</span></code></pre>
+<p>Generated Actions: </p>
+<ul>
+<li>indices of interest are the indices that notDisjoint found </li>
+<li>indices of interest = [2]</li>
+</ul>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  board[<span class="z-constant z-numeric z-purescript">2</span>] <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">000100010</span> <span class="z-constant z-other z-purescript">AND</span> <span class="z-constant z-numeric z-purescript">000000010</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-numeric z-purescript">000000010</span>
+</span></code></pre>
+<p>Generalized:</p>
+<pre class="z-code"><code><span class="z-text z-plain">  board[n] = board[n] AND cell
+  where
+  n is an index of interest
+  cell is the possible combination of options that generated n
+</span></code></pre>
+<h2 id="standardizing-actions">Standardizing Actions</h2>
+<p>Actions above were described as mutations to the board.</p>
+<p>If we treat <code>board</code> as some global state, this is how we might wright action in Javascript.</p>
+<pre data-lang="typescript" class="language-typescript z-code"><code class="language-typescript" data-lang="typescript"><span class="z-source z-ts">  <span class="z-meta z-function z-ts"><span class="z-storage z-type z-function z-ts">function</span> <span class="z-meta z-definition z-function z-ts"><span class="z-entity z-name z-function z-ts">action</span></span><span class="z-meta z-parameters z-ts"><span class="z-punctuation z-definition z-parameters z-begin z-ts">(</span><span class="z-variable z-parameter z-ts">index</span><span class="z-punctuation z-separator z-parameter z-ts">,</span> <span class="z-variable z-parameter z-ts">cell</span><span class="z-punctuation z-definition z-parameters z-end z-ts">)</span></span><span class="z-meta z-block z-ts"><span class="z-punctuation z-definition z-block z-ts">{</span> 
+    <span class="z-variable z-other z-readwrite z-ts">board</span><span class="z-meta z-array z-literal z-ts"><span class="z-meta z-brace z-square z-ts">[</span><span class="z-variable z-other z-readwrite z-ts">index</span><span class="z-meta z-brace z-square z-ts">]</span></span> <span class="z-keyword z-operator z-assignment z-ts">=</span> <span class="z-variable z-other z-readwrite z-ts">board</span><span class="z-meta z-array z-literal z-ts"><span class="z-meta z-brace z-square z-ts">[</span><span class="z-variable z-other z-readwrite z-ts">index</span><span class="z-meta z-brace z-square z-ts">]</span></span> <span class="z-variable z-other z-constant z-ts">AND</span> <span class="z-variable z-other z-readwrite z-ts">cell</span>
+  <span class="z-punctuation z-definition z-block z-ts">}</span></span></span>
+</span></code></pre>
+<p>The take-away is that two integers (index &amp; cell) are enough to encode any action described above. 
+We can use types to describe an action like this is purescript:</p>
+<pre data-lang="purescript" class="language-purescript z-code"><code class="language-purescript" data-lang="purescript"><span class="z-source z-purescript">  <span class="z-keyword z-other z-purescript">newtype</span> <span class="z-constant z-other z-purescript">Index</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-other z-purescript">Index</span> <span class="z-constant z-other z-purescript">Int</span>
+  <span class="z-keyword z-other z-purescript">newtype</span> <span class="z-constant z-other z-purescript">Cell</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-other z-purescript">Cell</span> <span class="z-constant z-other z-purescript">Int</span>
+  <span class="z-keyword z-other z-purescript">type</span> <span class="z-constant z-other z-purescript">Action</span> <span class="z-keyword z-operator z-purescript">=</span> <span class="z-constant z-other z-purescript">Tuple</span> <span class="z-constant z-other z-purescript">Index</span> <span class="z-constant z-other z-purescript">Cell</span>
+</span></code></pre>
+<h2 id="algorithm-optimizations">Algorithm optimizations</h2>
+<p>Checking a rank-3 board for every possible naked or hidden tuple requires <code>248,346 (511 * 27 * 9 * 2)</code> bitwise operations. On most modern CPUs, that takes a few microseconds (I measured this at 62μs). At such small numbers, the cost of computing tuples will be dwarfed by the cost of cash misses while reading from and writing to memory. I found that implementing optimizations in PureScript offered immediate benefits, but trying the same thing with my Rust implementaion was trickier. My guess for why (Without digging into the generated assembly) is that any optimization that might invalidate cash locality is a problem.</p>
+<p>So while there arguments to be made about premature optimizations, here are some things you can notice about this algorithm that may lead to optimizations if done carefully (and bench-marked, etc). Earlier, when we said smaller tuples where better, these are optimizations that witnesses that.</p>
+<h3 id="shrink-the-search-space">Shrink the search-space</h3>
+<p>Remember when we iterated through all possible sets of options (integers 1 to 511)? The naive implementation is to iterate through them using their natural ordering under integers. </p>
+<p><em>Yeah, don't do that.</em> Instead, order this by the cardinality of the sets. (Remember that the cardinality of a set is the number of 1s in its binary representation.)</p>
+<p>For a board of size 9, that looks like this:</p>
+<p><code>1, 2, 4, 8, 16, 32, 64, 128, 256, 3, 5, 6, 9, 10, 12, 17, 18, 20, 24, 33, 34, 36, 40, 48, 65, 66, 68, 72, 80, 96, 129, 130, 132, 136, 144, 160, 192, 257, 258, 260, 264, 272, 288, 320, 384, [...etc, etc], 255, 383, 447, 479, 495, 503, 507, 509, 510, 511</code></p>
+<p>It's easier to spot the cardinality of each set of options if the same sequence is written in binary:</p>
+<p><code>000000001, 000000010, 000000100, 000001000, 000010000, 000100000, 001000000, 010000000, 100000000, 000000011, 000000101, 000000110, 000001001, 000001010, 000001100, 000010001, 000010010, 000010100, 000011000, 000100001, 000100010, 000100100, 000101000, 000110000, 001000001, 001000010, 001000100, 001001000, 001010000, 001100000, 010000001, 010000010, 010000100, 010001000, 010010000, 010100000, 011000000, 100000001, 100000010, 100000100, 100001000, 100010000, 100100000, 101000000, 110000000, [...etc, etc], 011111111, 101111111, 110111111, 111011111, 111101111, 111110111, 111111011, 111111101, 111111110, 111111111</code></p>
+<p>Now searching for Tuples starts with the smallest sets of options and progresses to larger ones. Because of this ordering, if a tuple is found:</p>
+<ul>
+<li>Options within the tuple can be ignored when searching for more tuples (Fewer possible sets of options to iterate through)</li>
+<li>Indices containing the tuple can be ignored when searching for more tuples (Fewer indices to check for tuples)</li>
+<li>Sets of options with size larger than the size of the remaining indices can be ignored
+<ul>
+<li>Since possible sets of options are ordered by size, the above can be implemented via an early return</li>
+</ul>
+</li>
+</ul>
+<h3 id="free-naked-n-tuples">Free Naked N-Tuples</h3>
+<p>You can also get some Naked Tuples for free while running the either Tuple algorithm
+For example:</p>
+<ul>
+<li><strong>If</strong> a row finds a hidden 2 Tuple <strong>and</strong> both indices are in the same box</li>
+<li><strong>Then</strong> those two indices describe a Naked 2 Tuple for the box.
+If you don't take the Free Naked 2 Tuple described in this example, The next iteration will discover it as a Hidden 7 Tuple. Duplicating the work being done.</li>
+</ul>
+<p><strong>In general</strong>, if the indices of an N-Tuple from one unit are all peers in any other unit, then they are a Naked N Tuple in that other unit.</p>
+
+<p><b><a href="#">Back to top</a></b></p>
+    </article>
+    <div class="toc" aria-hidden="true">
+      <div class="toc-sticky">
+        <h3>Index</h3>
+        <div class="toc-item">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#sudoku-notations">Sudoku notations</a>
+        </div>
+        <div class="toc-item">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#vocabulary">Vocabulary</a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#the-one-rule"><small>- The One Rule</small></a>
+        </div>
+        <div class="toc-item">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#overview">Overview</a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#n-tuple-examples"><small>- N-Tuple examples</small></a>
+        </div>
+        <div class="toc-item">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#how-to-find-a-tuple">How to find a Tuple</a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#how-to-find-a-naked-n-tuple"><small>- How to find a Naked N-Tuple.</small></a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#how-to-find-a-hidden-n-tuple"><small>- How to find a Hidden N-Tuple</small></a>
+        </div>
+        <div class="toc-item">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#how-tuples-constrain-a-board">How Tuples Constrain a Board</a>
+        </div>
+        <div class="toc-item">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#representing-data">Representing Data</a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#representing-a-cell"><small>- Representing a Cell</small></a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#representing-a-board"><small>- Representing a board</small></a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#groups"><small>- Groups</small></a>
+        </div>
+        <div class="toc-item">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#algorithm">Algorithm</a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#hidden-n-tuples-naked-n-tuples-algorithm"><small>- Hidden N Tuples &amp; Naked N Tuples Algorithm</small></a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#standardizing-actions"><small>- Standardizing Actions</small></a>
+        </div>
+        <div class="toc-item-child">
+          <a class="subtext" href="https://trequetrum.github.io/blog-onesmallstep/n-tuple-sudoku/#algorithm-optimizations"><small>- Algorithm optimizations</small></a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <hr />
+    <div class="c">
+      <nav>
+        <ul></ul>
+      </nav>
+      <p class="s90">Copyright &copy; 2023 One Small Step</p>
+      <nav>
+        <ul><li class="s90"> <a href="https://trequetrum.github.io/blog-onesmallstep/about/"> About </a> </li><li class="s90"> <a href="https://trequetrum.github.io/blog-onesmallstep/privacy/"> Privacy </a> </li><li class="s90"> <a href="https://trequetrum.github.io/blog-onesmallstep/sitemap.xml" target="_blank"> Sitemap </a> </li></ul>
+      </nav>
+    </div>
+  </footer>
+<span class="topout">
+<span class="topleft"> </span><a href="#" class="top" title="Back to Top"><i class="svgs svgh angu"></i></a>
+</span>
+</body>
+</html>
