@@ -22,7 +22,7 @@ Why would you want to know how to derive the Y-Combinator? Well, mostly for inte
 
 # Prelude
 
-This blog entry roughly follows an imaginary sequence of thoughts that one could potentially have; the net result of which would be discovering something very much like the Y-Combinator — a variadic extension, perhaps? It's not that important what we call it. We'll jump right in with Python. We're going to start with a very simple function and a contrived restriction, then keep taking little steps to abstract a bit at a time.
+This blog entry attempts to create a series of small exploratory steps; the net result of which uncovers something very much like the Y-Combinator — a variadic extension, perhaps? It's not that important what we call it. We'll jump right in with Python. We're going to start with a very simple function and a contrived restriction, then keep taking little steps to abstract a bit at a time.
 
 What we're about to do is feed some of the ideas from λ-calc into a simple python program. I don't believe writing Python as λ-calc is a either a recipe for success or a very pythonic thing to do. We're treating Python more as a means to actively play around with pseudo-code than any attempt to be abidingly Pythonic. Python’s dynamic nature and relatively unobtrusive syntax make it a good language to use for this. In the off chance you want to copy some of the code and play around with it until it makes sense, this should be a fairly straight forward task.
 
@@ -30,7 +30,7 @@ I also think Python's runtime semantics are intuitive to a lot of programmers. S
 
 # An anonymous version of factorial
 
-Our first step here is going to be to try to puzzle out how to write an anonymous recursive function. 
+Our first step is going to be to try to puzzle out how to write an anonymous recursive function. 
 
 Without recursion, this task is generally quite simple. Here is a function named `double`, to apply some value to the function we first reference it by name and apply a value (Instead of a standard Python function `def`, I’ve assigned a lambda expression to a variable. It just makes the transformation into an anonymous function very simple).
 
@@ -51,6 +51,26 @@ Of course, if I want to define the same function without naming it, I can do so.
 10
 ```
 
+When you do this, at first blush it looks like the re-usability of functions becomes lost to you. For instance, what if I want to know what happens when I compute `double(5) + double(6)`? It looks like I have to copy my anonymous function a second time.
+
+```Python
+(lambda n: n + n)(5) + (lambda n: n + n)(6)
+```
+```Output
+22
+```
+
+Why even create a function if we can't re-use it? Fortunatly, we can rescue this situation with a little bit of work. We can paramaterize the function itself, which lets us call the parameter twice.
+
+```Python
+(lambda double: double(5) + double(6))(lambda n: n + n)
+```
+```Output
+22
+```
+
+This is a way in which we can make sense of an expression like `double(5) + double(6)`.
+
 Why restrict ourselves to anonymous functions? Well, nearly every example of recursion you'll see performs the self-referencing step by name. By untangling this single restriction we can both arrive at a deeper understanding of recursion and derive the Y-Combinator. Rather neat, no?
 
 There is a lot of content out there that starts by introducing λ-calc basics and going from there. I chose this sort of sideways approach because as far as I know it is a relatively novel way of understanding this cool bit of computing history.
@@ -58,6 +78,8 @@ There is a lot of content out there that starts by introducing λ-calc basics an
 As a formal definition of recursion λ-calc's Fix-Point Combinator doesn’t much care about how other mathematical objects like numbers or propositions are represented. I think we can get a reasonable distance toward understanding a version of the Fix-Point Combinator via the semantics of Python without worrying about  λ-terms, how variables are introduced, what makes a legal α-conversion or β-reduction, etc. I contend we don’t need any of that for what's described here.
 
 What we do need, however, is the single restriction that stops us from using Python's built in call-site resolution to perform recursion on our behalf. Once we've shown that it can be done, we'll start using names again to keep the code going forward a little cleaner and easy to understand.
+
+----
 
 Here is the function I want to write anonymously:
 
@@ -389,13 +411,13 @@ fix( # GCD
 Which gets us to a really nice place. Using fix, we can create any recursive function anonymously if we just include `f` as the first parameter and call it exactly the same way we'd make our recursive calls usually.
 
 ```Python
-fact =     lambda    n: 1 if n==0 else n * fact(n-1)
+fact = lambda    n: 1 if n==0 else n * fact(n-1)
 # becomes
-fact = fix(lambda f, n: 1 if n==0 else n *    f(n-1))
+fix(   lambda f, n: 1 if n==0 else n *    f(n-1))
 #--------------------------------------------------------------
-gcd  =     lambda    a, b: a if b % a == 0 else gcd(b % a, a)
+gcd  = lambda    a, b: a if b % a == 0 else gcd(b % a, a)
 # becomes
-gcd  = fix(lambda f, a, b: a if b % a == 0 else   f(b % a, a))
+fix(   lambda f, a, b: a if b % a == 0 else   f(b % a, a))
 ```
 
 # fix is the Y-Combinator
